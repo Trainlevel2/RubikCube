@@ -12,10 +12,14 @@ var colors = [];
 // var zAxis = 2;
 
 // var axis = 0;
-var theta = [ 0, 0, 0 ];
+var theta = [0,0,0]
 var thetaLoc;
 var moving = 0;
+var reverse = 0;
 var rMatrixLoc;
+
+var enter = 0;
+var ind = 0;
 
 var near   = -1.5;
 var far    =  1.5;
@@ -23,16 +27,24 @@ var bottom = -1.5;
 var ytop   =  1.5;
 var left   = -1.5;
 var right  =  1.5;
+var g = 0;
 var eye    = vec3(0.2,0.2,1.0);
 const at = vec3(0.0,0.0,0.0);
 const up = vec3(0.0,1.0,0.0);
 var mvMatrixLoc;
 var pMatrixLoc;
+var grMatrixLoc;
 var mvMatrix;	//Model-view Matrix
 var pMatrix;	//Projection Matrix
 var totpoints=[];
 var totcolors=[];
 
+var mPrime=0;
+var oPrime=0;
+var vPrime=0;
+var v=0;
+var m=0;
+var o=0;
 
 // Keys - Planes
 var numKey=0;
@@ -50,6 +62,17 @@ var SHFT = 0;
 
 var cubes=[];
 
+
+
+function noneMoving(){
+	for(var i = 0; i<cubes.length; i++){
+		if(cubes[i].moving){
+			return false;
+		}
+	}
+	return true;
+}
+
 //Initialize all the values
 function initKeyGroups(){
 	L = new Object();
@@ -59,7 +82,7 @@ function initKeyGroups(){
 	L.down   = [0,9,18];
 	L.middle = 12;
 	L.up     = [6,15,24];
-	// L = [0,3,6,9,12,15,18,21,24]; //Left
+	L.solved = [0,3,6,9,12,15,18,21,24]; //Left
 
 	R = new Object();
 	R.right  = [2,5,8];
@@ -68,7 +91,7 @@ function initKeyGroups(){
 	R.down  = [2,11,20];
 	R.middle= 14;
 	R.up    = [8,17,26];
-	// R = [2,5,8,11,14,17,20,23,26]; //Right
+	R.solved = [2,5,8,11,14,17,20,23,26]; //Right
 
 	U = new Object();
 	U.up    = [6,7,8];
@@ -77,7 +100,7 @@ function initKeyGroups(){
 	U.left  = [6,15,24];
 	// U.vertic= [7,16,25];
 	U.right = [8,17,26];
-	// U = [6,7,8,15,16,17,24,25,26]; //Up/Top
+	U.solved = [6,7,8,15,16,17,24,25,26]; //Up/Top
 
 	D = new Object();
 	D.down  = [0,1,2];
@@ -86,7 +109,7 @@ function initKeyGroups(){
 	D.left  = [0,9,18];
 	// D.vertic= [1,10,19];
 	D.right = [2,11,20];
-	// D = [0,1,2,9,10,11,18,19,20]; //Down/Bottom
+	D.solved = [0,1,2,9,10,11,18,19,20]; //Down/Bottom
 
 	B = new Object();
 	B.down  = [0,1,2];
@@ -95,7 +118,7 @@ function initKeyGroups(){
 	B.right  = [0,3,6];
 	// B.vertic= [1,4,7];
 	B.left = [2,5,8];
-	// B = [0,1,2,3,4,5,6,7,8]; //Back
+	B.solved = [0,1,2,3,4,5,6,7,8]; //Back
 
 	F = new Object();
 	F.down  = [18,19,20];
@@ -104,7 +127,7 @@ function initKeyGroups(){
 	F.left  = [18,21,24];
 	// F.vertic= [19,22,25];
 	F.right = [20,23,26];	
-	// F = [18,19,20,21,22,23,24,25,26]; //Front
+	F.solved = [18,19,20,21,22,23,24,25,26]; //Front
 
 	// V = new Object();
 	// V.left  = [1,4,7];
@@ -184,72 +207,35 @@ window.onload = function init(){
 	thetaLoc   = gl.getUniformLocation (program, "theta"   );
 	mvMatrixLoc= gl.getUniformLocation (program, "mvMatrix");
 	pMatrixLoc = gl.getUniformLocation (program, "pMatrix" );
+	grMatrixLoc = gl.getUniformLocation(program, "grMatrix");
 
+	checkIt();
 
  	render();
     //event listeners for buttons
 
     document.getElementById( "xButton" ).onclick = function () {
-
-		console.log(cubes[0].rMatrix);
-    	for(var i = 0; i<cubes.length; i++){
-    		if(cubes[i].moving){
-    			return;
-    		}
-    	}
-    	for(var i = 0; i<cubes.length; i++){
-	        cubes[i].axis = cubes[i].xAxis;
-	        // var temp = cubes[i].yAxis;
-	        // switch(cubes[i].xState){
-	        // 	case 0:
-	        // 	cubes[i].yAxis=cubes[i].zAxis;
-	        // 	cubes[i].zAxis=temp;
-	        // 	break;
-	        // 	case 1:
-	        // 	cubes[i].yAxis=cubes[i].zAxis;
-	        // 	cubes[i].zAxis=(temp+3)%6;
-	        // 	break;
-	        // 	case 2:
-	        // 	cubes[i].yAxis=cubes[i].zAxis;
-	        // 	cubes[i].zAxis=temp;
-	        // 	break;
-	        // 	case 3:
-	        // 	cubes[i].yAxis=cubes[i].zAxis;
-	        // 	cubes[i].zAxis=(temp+3)%6
-	        // 	break;;
-	        // }
-	        
-	    	// cubes[i].xState=(cubes[i].xState+1)%4;
-    		cubes[i].moving = 1;
-    	}
-    	console.log(cubes[0].xAxis+","+cubes[0].yAxis+","+cubes[0].zAxis)
+    	g=1;
+    	rotateCubeHoriz();
     };
     document.getElementById( "yButton" ).onclick = function () {
-    	for(var i = 0; i<cubes.length; i++){
-    		if(cubes[i].moving){
-    			return;
-    		}
-    	}
-     	for(var i = 0; i<cubes.length; i++){
-        	cubes[i].axis = cubes[i].yAxis;
-    		cubes[i].moving = 1;
-    	}
-    	console.log(cubes[0].xAxis+","+cubes[0].yAxis+","+cubes[0].zAxis)
-
+    	g=1;
+    	rotateCubeVert();
     };
-    document.getElementById( "zButton" ).onclick = function () {
-    	for(var i = 0; i<cubes.length; i++){
-    		if(cubes[i].moving){
-    			return;
-    		}
-    	}
-     	for(var i = 0; i<cubes.length; i++){
-        	cubes[i].axis = cubes[i].zAxis;
-    		cubes[i].moving = 1;
-    	}
-    	console.log(cubes[0].xAxis+","+cubes[0].yAxis+","+cubes[0].zAxis)
+    // document.getElementById( "zButton" ).onclick = function () {
+    // 	g=1;
+    // 	for(var i = 0; i<cubes.length; i++){
+    // 		if(cubes[i].moving){
+    // 			return;
+    // 		}
+    // 	}
+    //  	for(var i = 0; i<cubes.length; i++){
+    //     	cubes[i].axis = cubes[i].zAxis;
+    // 		cubes[i].moving = 1;
+    // 	}
 
-    };
+    // };
+
     // document.getElementById( "Stop").onclick = function () { 
     // 	for(var i = 0; i<cubes.length; i++){
     // 		if(cubes[i].moving){
@@ -265,48 +251,175 @@ window.onload = function init(){
 	   //  // 	document.getElementById("Stop").innerHTML = "Stop Cube";
     // };
 	document.getElementById( "Reverse" ).onclick = function () {
-    	for(var i = 0; i<cubes.length; i++){
-	        cubes[i].axis=(cubes[i].axis+3)%6;
-	        cubes[i].xAxis = (cubes[i].xAxis+3)%6;
-	        cubes[i].yAxis = (cubes[i].yAxis+3)%6;
-	        cubes[i].zAxis = (cubes[i].zAxis+3)%6;
-	    }
+		//fix
+		reverse = !reverse;
+    	// for(var i = 0; i<cubes.length; i++){
+	    //     cubes[i].axis=(cubes[i].axis+3)%6;
+	    //     cubes[i].xAxis = (cubes[i].xAxis+3)%6;
+	    //     cubes[i].yAxis = (cubes[i].yAxis+3)%6;
+	    //     cubes[i].zAxis = (cubes[i].zAxis+3)%6;
+	    // }
     };    
+}
+function rotateObjCo(Obj){
+
+	//Move the indices on the plane and change other plane's indices
+	//Rotating face clockwise means right = up, up = left, left = down, down = right, middle = veritc, vertic = middle;
+	if(!reverse){
+		var tempu = Obj.up;
+		var tempr = Obj.right;
+		var tempd = Obj.down;
+		var templ = Obj.left; 
+		Obj.right = tempu;   //right = up
+		Obj.up  = templ;   //up = left
+		Obj.left = tempd; //left = down
+		Obj.down = tempr;  //down  = right
+	}
+	//Rotating face anticlockwise means right = down, down = left, left = up, up = right, middle = vertic, vertic = middle;
+	else{
+		var tempu = Obj.up;
+		var tempd = Obj.down;
+		var templ = Obj.left;
+		var tempr = Obj.right;
+		Obj.up = tempr;	//up = right
+		Obj.left = tempu;	//left = up
+		Obj.down = templ; //down = left
+		Obj.right = tempd;//right= down
+	}
+}
+
+function rotateCubeHoriz(){
+    	for(var i = 0; i<cubes.length; i++){
+    		if(cubes[i].moving){
+    			return;
+    		}
+    	}
+    	for(var i = 0; i<cubes.length; i++){
+    		if(!reverse)
+    			cubes[i].axis = 1;
+    		else
+		        cubes[i].axis = 4;
+    		cubes[i].moving = 1;
+    	}
+    	if(cubes[0].axis>2){
+    		var tempF = JSON.parse(JSON.stringify(F));
+    		var tempR = JSON.parse(JSON.stringify(R));
+    		var tempL = JSON.parse(JSON.stringify(L));
+    		var tempB = JSON.parse(JSON.stringify(B));
+    		L = tempB;
+    		F = tempL;
+    		R = tempF;
+    		B = tempR;
+    		reverse = 0;
+       		rotateObjCo(D);	//rotate D plane counterclockwise
+    		reverse = 1;
+    		rotateObjCo(U);    //rotate U plane clockwise
+    		// reverse = 1;
+    	}
+    	else{
+    		var tempF = JSON.parse(JSON.stringify(F));
+    		var tempR = JSON.parse(JSON.stringify(R));
+    		var tempL = JSON.parse(JSON.stringify(L));
+    		var tempB = JSON.parse(JSON.stringify(B));
+    		L = tempF;
+    		F = tempR;
+    		R = tempB;
+    		B = tempL
+    		reverse = 1;
+    		rotateObjCo(D);   //rotate U plane counterclockwise
+    		reverse = 0;
+    		rotateObjCo(U);   //rotate D plane clockwise
+    	}
+
+}
+
+function rotateCubeVert(){
+    	for(var i = 0; i<cubes.length; i++){
+    		if(cubes[i].moving){
+    			return;
+    		}
+    	}
+     	for(var i = 0; i<cubes.length; i++){
+     		if(!reverse)
+     			cubes[i].axis=0;
+     		else
+	        	cubes[i].axis =3;
+    		cubes[i].moving = 1;
+    	}
+    	if(cubes[0].axis>2){
+    		var tempF = JSON.parse(JSON.stringify(F));
+    		var tempD = JSON.parse(JSON.stringify(D));
+    		var tempB = JSON.parse(JSON.stringify(B));
+    		var tempU = JSON.parse(JSON.stringify(U));
+    		F = tempU;
+    		D = tempF;
+    		rotateObjCo(tempD);
+    		rotateObjCo(tempD);
+    		B = tempD
+    		rotateObjCo(tempB);
+    		rotateObjCo(tempB);
+    		U = tempB;
+    		reverse = 0;
+    		rotateObjCo(L);
+    		reverse = 1;
+    		rotateObjCo(R);
+    	}
+    	else{
+			console.log("F.left"+F.left);
+			console.log("U.left"+U.left);
+    		var tempF = JSON.parse(JSON.stringify(F));
+    		var tempD = JSON.parse(JSON.stringify(D));
+    		var tempB = JSON.parse(JSON.stringify(B));
+    		var tempU = JSON.parse(JSON.stringify(U));
+    		F = tempD;
+    		rotateObjCo(tempB);
+    		rotateObjCo(tempB);
+    		D = tempB;
+    		rotateObjCo(tempU);
+    		rotateObjCo(tempU);
+    		B = tempU;
+    		U = tempF;
+    		reverse = 0;
+    		rotateObjCo(R);
+    		reverse = 1;
+    		console.log("L.Left",L.left,"UP",L.up,"Right",L.right,"down",L.down+"\n");
+    		rotateObjCo(L);
+    		reverse = 0;
+			console.log("L.Left",L.left,"UP",L.up,"Right",L.right,"down",L.down+"\n");
+			console.log("F.left"+F.left);
+    	}
 }
 
 function rotateL(){
-   	for(var i = 0; i<cubes.length; i++)
-		cubes[i].axis = (cubes[i].yAxis+3)%6;
-	//Initialize Parameters
-	L.up = U.left;
-	L.right = F.left;
-	L.down = D.left;
-	L.left = B.right;		
-	console.log(L.up+"\n"+L.left+"\n"+L.right+"\n"+L.down+"\n");
+	console.log("RotateL");
+	console.log("Left",L.left,"UP",L.up,"Right",L.right,"down",L.down+"\n");
+   	for(var i = 0; i<cubes.length; i++){
+		cubes[i].axis = 3;
+   	}
 	//Rotate The Plane
 	for(var i = 0; i<L.left.length; i++){
-		for(var j = 0; j<theta.length; j++){
-			cubes[L.left[i]].curTheta[j] = cubes[R.left[i]].theta[j];
-		}
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[L.left[i]].curTheta[j] = cubes[R.left[i]].theta[j];
+		// }
 		cubes[L.left[i]].moving = 1;
 	}
 	//Rotate center cube
-	for(var j = 0; j<theta.length; j++){
-		cubes[L.up[1]].curTheta[j] = cubes[R.up[1]].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[L.up[1]].curTheta[j] = cubes[R.up[1]].theta[j];
+	// }
 	cubes[L.up[1]].moving = 1;
-	for(var j = 0; j<theta.length; j++){
-		cubes[L.middle].curTheta[j] = cubes[R.middle].theta[j];
-	}
-	for(var j = 0; j<theta.length; j++){
-		cubes[L.down[1]].curTheta[j] = cubes[R.down[1]].theta[j];
-	}
-	cubes[L.down[1]].moving = 1;
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[L.middle].curTheta[j] = cubes[R.middle].theta[j];
+	// }
 	cubes[L.middle].moving = 1;
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[L.down[1]].curTheta[j] = cubes[R.down[1]].theta[j];
+	// }
+	cubes[L.down[1]].moving = 1;
 	for(var i = 0; i<L.right.length; i++){
-		for(var j = 0; j<theta.length; j++){
-			cubes[L.right[i]].curTheta[j] = cubes[R.right[i]].theta[j];
-		}
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[L.right[i]].curTheta[j] = cubes[R.right[i]].theta[j];
+		// }
 		cubes[L.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -320,8 +433,6 @@ function rotateL(){
 		L.up  = templ;   //up = left
 		L.left = tempd; //left = down
 		L.down = tempr;  //down  = right
-		console.log(L.up+"\n"+L.left+"\n"+L.right+"\n"+L.down+"\n");
-
 	}
 	//Rotating face anticlockwise means right = down, down = left, left = up, up = right, middle = vertic, vertic = middle;
 	else{
@@ -336,43 +447,63 @@ function rotateL(){
 	}
 
 	//adjust other paramters
-	U.left = L.up;
-	F.left = L.right;
-	D.left = L.down;
-	B.right = L.left;
+	var indup = intersect(U.up,U.left);
+	var inddown = intersect(U.down,U.left);
+	U.left = JSON.parse(JSON.stringify(L.up));
+	U.up[indup] = JSON.parse(JSON.stringify(L.up[intersect(L.up,L.left)]));
+	U.down[inddown] = JSON.parse(JSON.stringify(L.up[intersect(L.up,L.right)]));
+
+	indup = intersect(F.up,F.left);
+	inddown = intersect(F.down, F.left);
+	F.left = JSON.parse(JSON.stringify(L.right));
+	F.up[indup] = JSON.parse(JSON.stringify(L.right[intersect(L.right,L.up)]));
+	F.down[inddown] = JSON.parse(JSON.stringify(L.right[intersect(L.right,L.down)]));
+
+	indup = intersect(D.up,D.left);
+	inddown = intersect(D.down, D.left);
+	D.left = JSON.parse(JSON.stringify(L.down));
+	D.up[indup] = JSON.parse(JSON.stringify(L.down[intersect(L.down,L.right)]));
+	D.down[inddown] = JSON.parse(JSON.stringify(L.down[intersect(L.down,L.left)]));
+
+	indup = intersect(B.up,B.right);
+	inddown = intersect(B.down,B.right);
+	B.right = JSON.parse(JSON.stringify(L.left));
+	B.up[indup] =JSON.parse(JSON.stringify(L.left[intersect(L.left,L.up)]));
+	B.down[inddown] = JSON.parse(JSON.stringify(L.left[intersect(L.left,L.down)]));
+
+	console.log("Left",L.left,"UP",L.up,"Right",L.right,"down",L.down+"\n");
+
 }
 
 function rotateR(){
+
+	console.log("RotateR");
+	console.log("Left",R.left,"UP",R.up,"Right",R.right,"down",R.down+"\n");
+
    	for(var i = 0; i<cubes.length; i++)
-		cubes[i].axis = cubes[i].yAxis;
-	//Initialize Parameters
-	R.up = U.right;
-	R.left = F.right;
-	R.right = B.left;
-	R.down = D.right;
-	//Rotate The Plane
+		cubes[i].axis = 0;
 	for(var i = 0; i<R.left.length; i++){
-		for(var j = 0; j<theta.length; j++){
-			cubes[R.left[i]].curTheta[j] = cubes[L.left[i]].theta[j];
-		}
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[R.left[i]].curTheta[j] = cubes[L.left[i]].theta[j];
+		// }
 		cubes[R.left[i]].moving = 1;
 	}
-	for(var j = 0; j<theta.length; j++){
-		cubes[R.up[1]].curTheta[j] = cubes[L.up[1]].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[R.up[1]].curTheta[j] = cubes[L.up[1]].theta[j];
+	// }
 	cubes[R.up[1]].moving = 1;
-	for(var j = 0; j<theta.length; j++){
-		cubes[R.middle].curTheta[j] = cubes[L.middle].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[R.middle].curTheta[j] = cubes[L.middle].theta[j];
+	// }
 	cubes[R.middle].moving = 1;
-	for(var j = 0; j<theta.length; j++){
-		cubes[R.down[1]].curTheta[j] = cubes[L.down[1]].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[R.down[1]].curTheta[j] = cubes[L.down[1]].theta[j];
+	// }
 	cubes[R.down[1]].moving = 1;
 	for(var i = 0; i<R.right.length; i++){
-		for(var j = 0; j<theta.length; j++){
-			cubes[R.right[i]].curTheta[j] = cubes[L.right[i]].theta[j];
-		}
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[R.right[i]].curTheta[j] = cubes[L.right[i]].theta[j];
+		// }
 		cubes[R.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -399,43 +530,61 @@ function rotateR(){
 		R.right = tempd;//right= down
 	}
 	//adjust other paramters
-	U.right = R.up;
-	F.right = R.left;
-	D.right = R.down;
-	B.left = R.right;	
+	var indup = intersect(U.up,U.right);
+	var inddown = intersect(U.down,U.right);
+	U.right = JSON.parse(JSON.stringify(R.up));
+	U.up[indup] = JSON.parse(JSON.stringify(R.up[intersect(R.up,R.right)]));
+	U.down[inddown] = JSON.parse(JSON.stringify(R.up[intersect(R.up,R.left)]));
+
+	indup = intersect(F.up,F.right);
+	inddown = intersect(F.down,F.right);
+	F.right = JSON.parse(JSON.stringify(R.left));
+	F.up[indup] = JSON.parse(JSON.stringify(R.left[intersect(R.left,R.up)]));
+	F.down[inddown] = JSON.parse(JSON.stringify(R.left[intersect(R.left,R.down)]));
+
+	indup = intersect(D.up,D.right);
+	inddown = intersect(D.down, D.right);
+	D.right = JSON.parse(JSON.stringify(R.down));
+	D.up[indup] = JSON.parse(JSON.stringify(R.down[intersect(R.down,R.left)]));
+	D.down[inddown] = JSON.parse(JSON.stringify(R.down[intersect(R.down,R.right)]));
+
+	indup = intersect(B.up,B.left);
+	inddown = intersect(B.down, B.left);
+	B.left = JSON.parse(JSON.stringify(R.right));
+	B.up[indup] = JSON.parse(JSON.stringify(R.right[intersect(R.right,R.up)]));
+	B.down[inddown] = JSON.parse(JSON.stringify(R.right[intersect(R.right,R.down)]));
+
+	console.log("Left",R.left,"UP",R.up,"Right",R.right,"down",R.down+"\n");	
 }
 
 function rotateU(){
+	console.log("RotateU");
+	console.log("Left",U.left,"UP",U.up,"Right",U.right,"down",U.down+"\n");
 	for(var i = 0; i<cubes.length; i++)
-		cubes[i].axis = (cubes[i].xAxis+3)%6;
+		cubes[i].axis = 1;
 	//Rotate The Plane
-	//Initialize Plane Values
-	U.down = F.up;
-	U.right = R.up;
-	U.left = L.up;
-	U.up = B.up;
 	for(var i = 0; i<U.left.length; i++){
-		for(var j = 0; j<theta.length; j++){
-			cubes[U.left[i]].curTheta[j] = cubes[D.left[i]].theta[j];
-		}
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[U.left[i]].curTheta[j] = cubes[D.left[i]].theta[j];
+		// }
 		cubes[U.left[i]].moving = 1;
 	}
-	for(var j = 0; j<theta.length; j++){
-		cubes[U.up[1]].curTheta[j] = cubes[D.up[1]].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[U.up[1]].curTheta[j] = cubes[D.up[1]].theta[j];
+	// }
 	cubes[U.up[1]].moving = 1;
-	for(var j = 0; j<theta.length; j++){
-		cubes[U.middle].curTheta[j] = cubes[D.middle].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[U.middle].curTheta[j] = cubes[D.middle].theta[j];
+	// }
 	cubes[U.middle].moving = 1;
-	for(var j = 0; j<theta.length; j++){
-		cubes[U.down[1]].curTheta[j] = cubes[D.down[1]].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[U.down[1]].curTheta[j] = cubes[D.down[1]].theta[j];
+	// }
 	cubes[U.down[1]].moving = 1;
 	for(var i = 0; i<U.right.length; i++){
-		for(var j = 0; j<theta.length; j++){
-			cubes[U.right[i]].curTheta[j] = cubes[D.right[i]].theta[j];
-		}
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[U.right[i]].curTheta[j] = cubes[D.right[i]].theta[j];
+		// }
 		cubes[U.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -462,44 +611,61 @@ function rotateU(){
 		U.right = tempd;//right= down
 	}
 	//adjust other paramters
-	B.up = U.up;
-	R.up = U.right;
-	F.up = U.down;
-	L.up = U.left;
+	var indleft = intersect(B.left,B.up);
+	var indright = intersect(B.right,B.up);
+	B.up = JSON.parse(JSON.stringify(U.up));
+	B.left[indleft] = JSON.parse(JSON.stringify(U.up[intersect(U.up,U.right)]));
+	B.right[indright] = JSON.parse(JSON.stringify(U.up[intersect(U.up,U.left)]));
+
+	indleft = intersect(R.left,R.up);
+	indright = intersect(R.right,R.up);
+	R.up = JSON.parse(JSON.stringify(U.right));
+	R.left[indleft] = JSON.parse(JSON.stringify(U.right[intersect(U.right,U.down)]));
+	R.right[indright] = JSON.parse(JSON.stringify(U.right[intersect(U.right,U.up)]));
+
+	indleft = intersect(F.left,F.up);
+	indright = intersect(F.right,F.up);
+	F.up = JSON.parse(JSON.stringify(U.down));
+	F.left[indleft] = JSON.parse(JSON.stringify(U.down[intersect(U.down,U.left)]));
+	F.right[indright] = JSON.parse(JSON.stringify(U.down[intersect(U.down,U.right)]));
+
+	indleft = intersect(L.left,L.up);
+	indright = intersect(L.right,L.up);
+	L.up = JSON.parse(JSON.stringify(U.left));
+	L.left[indleft] = JSON.parse(JSON.stringify(U.left[intersect(U.left,U.up)]));
+	L.right[indright] = JSON.parse(JSON.stringify(U.left[intersect(U.left,U.down)]));
+	console.log("Left",U.left,"UP",U.up,"Right",U.right,"down",U.down+"\n");
 }
 
 function rotateD(){
+	console.log("RotateD");
+	console.log("Left",D.left,"UP",D.up,"Right",D.right,"down",D.down+"\n");
 	for(var i = 0; i<cubes.length; i++)
-		cubes[i].axis = cubes[i].xAxis;
+		cubes[i].axis = 4;
 	//Initialize Parameters
-	D.up = F.down;
-	D.right = R.down;
-	D.left = L.down;
-	D.down = B.down;
-
 	//Rotate The Plane
 	for(var i = 0; i<D.left.length; i++){
-		for(var j = 0; j<theta.length; j++){
-			cubes[D.left[i]].curTheta[j] = cubes[U.left[i]].theta[j];
-		}
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[D.left[i]].curTheta[j] = cubes[U.left[i]].theta[j];
+		// }
 		cubes[D.left[i]].moving = 1;
 	}
-	for(var j = 0; j<theta.length; j++){
-			cubes[D.up[1]].curTheta[j] = cubes[U.up[1]].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 		cubes[D.up[1]].curTheta[j] = cubes[U.up[1]].theta[j];
+	// }
 	cubes[D.up[1]].moving = 1;
-	for(var j = 0; j<theta.length; j++){
-			cubes[D.middle].curTheta[j] = cubes[U.middle].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 		cubes[D.middle].curTheta[j] = cubes[U.middle].theta[j];
+	// }
 	cubes[D.middle].moving = 1;
-	for(var j = 0; j<theta.length; j++){
-			cubes[D.down[1]].curTheta[j] = cubes[U.down[1]].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 		cubes[D.down[1]].curTheta[j] = cubes[U.down[1]].theta[j];
+	// }
 	cubes[D.down[1]].moving = 1;
 	for(var i = 0; i<D.right.length; i++){
-		for(var j = 0; j<theta.length; j++){
-			cubes[D.right[i]].curTheta[j] = cubes[U.right[i]].theta[j];
-		}
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[D.right[i]].curTheta[j] = cubes[U.right[i]].theta[j];
+		// }
 		cubes[D.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -526,107 +692,152 @@ function rotateD(){
 		D.right = tempd;//right= down
 	}
 	//adjust other paramters
-	F.down = D.up;
-	R.down = D.right;
-	B.down = D.down;
-	L.down = D.left;
+	var indleft = intersect(F.left,F.down);
+	var indright = intersect(F.right,F.down);
+	F.down = JSON.parse(JSON.stringify(D.up));
+	F.left[indleft] = JSON.parse(JSON.stringify(D.up[intersect(D.up,D.left)]));
+	F.right[indright] = JSON.parse(JSON.stringify(D.up[intersect(D.up,D.right)]));
+
+	indleft = intersect(R.left,R.down);
+	indright = intersect(R.right,R.down);
+	R.down = JSON.parse(JSON.stringify(D.right));
+	R.left[indleft] = JSON.parse(JSON.stringify(D.right[intersect(D.right,D.up)]));
+	R.right[indright] = JSON.parse(JSON.stringify(D.right[intersect(D.right,D.down)]));
+
+	indleft = intersect(B.left,B.down);
+	indright = intersect(B.right,B.down);
+	B.down = JSON.parse(JSON.stringify(D.down));
+	B.left[indleft] = JSON.parse(JSON.stringify(D.down[intersect(D.down,D.right)]));
+	B.right[indright] = JSON.parse(JSON.stringify(D.down[intersect(D.down,D.left)]));
+
+	indleft = intersect(L.left,L.down);
+	indright = intersect(L.right,L.down);
+	L.down = JSON.parse(JSON.stringify(D.left));
+	L.left[indleft] = JSON.parse(JSON.stringify(D.left[intersect(D.left,D.down)]));
+	L.right[indright] = JSON.parse(JSON.stringify(D.left[intersect(D.left,D.up)]));
+	console.log("Left",D.left,"UP",D.up,"Right",D.right,"down",D.down+"\n");
 }
 
 function rotateB(){
+
+	console.log("RotateB");
+	console.log("Left",B.left,"UP",B.up,"Right",B.right,"down",B.down+"\n");
 	for(var i = 0; i<cubes.length; i++)
-		cubes[i].axis = (cubes[i].zAxis+3)%6;
-		//Initialize Paramters
-		B.up = U.up;
-		B.left = R.right;
-		B.right = L.left;
-		B.down = D.down;
-		//Rotate The Plane
-		for(var i = 0; i<B.left.length; i++){
-			for(var j = 0; j<theta.length; j++){
-				cubes[B.left[i]].curTheta[j] = cubes[F.left[i]].theta[j];
-			}
-			cubes[B.left[i]].moving = 1;
-		}
-		for(var j = 0; j<theta.length; j++){
-			cubes[B.up[1]].curTheta[j] = cubes[F.up[1]].theta[j];
-		}
-		cubes[B.up[1]].moving = 1;
-		for(var j = 0; j<theta.length; j++){
-			cubes[B.middle].curTheta[j] = cubes[F.middle].theta[j];
-		}
-		cubes[B.middle].moving = 1;
-		for(var j = 0; j<theta.length; j++){
-			cubes[B.down[1]].curTheta[j] = cubes[F.down[1]].theta[j];
-		}
-		cubes[B.down[1]].moving = 1;
-		for(var i = 0; i<B.right.length; i++){
-			for(var j = 0; j<theta.length; j++){
-				cubes[B.right[i]].curTheta[j] = cubes[F.right[i]].theta[j];
-			}
-			cubes[B.right[i]].moving = 1;
-		}
-		//Move the indices on the plane and change other plane's indices
-		//Rotating face clockwise means right = up, up = left, left = down, down = right, middle = veritc, vertic = middle;
-		if(!SHFT){
-			var tempu = B.up;
-			var tempr = B.right;
-			var tempd = B.down;
-			var templ = B.left; 
-			B.right = tempu;   //right = up
-			B.up  = templ;   //up = left
-			B.left = tempd; //left = down
-			B.down = tempr;  //down  = right
-		}
-		//Rotating face anticlockwise means right = down, down = left, left = up, up = right, middle = vertic, vertic = middle;
-		else{
-			var tempu = B.up;
-			var tempd = B.down;
-			var templ = B.left;
-			var tempr = B.right;
-			B.up = tempr;	//up = right
-			B.left = tempu;	//left = up
-			B.down = templ; //down = left
-			B.right = tempd;//right= down
-		}
-		//adjust other paramters
-		U.up = B.up;
-		L.left = B.right;
-		D.down = B.down;
-		R.right = B.left;
+		cubes[i].axis = 2;
+	//Initialize Paramters
+	// B.up = U.up;
+	// B.left = R.right;
+	// B.right = L.left;
+	// B.down = D.down;
+	//Rotate The Plane
+	for(var i = 0; i<B.left.length; i++){
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[B.left[i]].curTheta[j] = cubes[F.left[i]].theta[j];
+		// }
+		cubes[B.left[i]].moving = 1;
+	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[B.up[1]].curTheta[j] = cubes[F.up[1]].theta[j];
+	// }
+	cubes[B.up[1]].moving = 1;
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[B.middle].curTheta[j] = cubes[F.middle].theta[j];
+	// }
+	cubes[B.middle].moving = 1;
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[B.down[1]].curTheta[j] = cubes[F.down[1]].theta[j];
+	// }
+	cubes[B.down[1]].moving = 1;
+	for(var i = 0; i<B.right.length; i++){
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[B.right[i]].curTheta[j] = cubes[F.right[i]].theta[j];
+		// }
+		cubes[B.right[i]].moving = 1;
+	}
+	//Move the indices on the plane and change other plane's indices
+	//Rotating face clockwise means right = up, up = left, left = down, down = right, middle = veritc, vertic = middle;
+	if(!SHFT){
+		var tempu = B.up;
+		var tempr = B.right;
+		var tempd = B.down;
+		var templ = B.left; 
+		B.right = tempu;   //right = up
+		B.up  = templ;   //up = left
+		B.left = tempd; //left = down
+		B.down = tempr;  //down  = right
+	}
+	//Rotating face anticlockwise means right = down, down = left, left = up, up = right, middle = vertic, vertic = middle;
+	else{
+		var tempu = B.up;
+		var tempd = B.down;
+		var templ = B.left;
+		var tempr = B.right;
+		B.up = tempr;	//up = right
+		B.left = tempu;	//left = up
+		B.down = templ; //down = left
+		B.right = tempd;//right= down
+	}
+	//adjust other paramters
+	var indleft = intersect(U.left,U.up);
+	var indright = intersect(U.right,U.up);
+	U.up = JSON.parse(JSON.stringify(B.up));
+	U.left[indleft] = JSON.parse(JSON.stringify(B.up[intersect(B.up,B.right)]));
+	U.right[indright] =JSON.parse(JSON.stringify(B.up[intersect(B.up,B.left)]));
+
+	var indup = intersect(L.up,L.left);
+	var inddown = intersect(L.down,L.left);
+	L.left = JSON.parse(JSON.stringify(B.right));
+	L.up[indup] = JSON.parse(JSON.stringify(B.right[intersect(B.right,B.up)]));
+	L.down[inddown] = JSON.parse(JSON.stringify(B.right[intersect(B.right,B.down)]));
+
+	indleft = intersect(D.left,D.down);
+	indright = intersect(D.right,D.down);
+	D.down = JSON.parse(JSON.stringify(B.down));
+	D.left[indleft] = JSON.parse(JSON.stringify(B.down[intersect(B.down,B.right)]));
+	D.right[indright] = JSON.parse(JSON.stringify(B.down[intersect(B.down,B.left)]));
+
+	indup = intersect(R.up,R.right);
+	inddown = intersect(R.down,R.right);
+	R.right = JSON.parse(JSON.stringify(B.left));
+	R.up[indup] = JSON.parse(JSON.stringify(B.left[intersect(B.left,B.up)]));
+	R.down[inddown] = JSON.parse(JSON.stringify(B.left[intersect(B.left,B.down)]));
+
+	console.log("Left",D.left,"UP",D.up,"Right",D.right,"down",D.down+"\n");
 }
 
 function rotateF(){
+	console.log("RotateF");
+	console.log("Left",F.left,"UP",F.up,"Right",F.right,"down",F.down+"\n");
 	for(var i = 0; i<cubes.length; i++)
-		cubes[i].axis = cubes[i].zAxis;
+		cubes[i].axis = 5;
 	//Initialize Parameters
-	F.up = U.down;
-	F.right = R.left;
-	F.down = D.up;
-	F.left = L.right;
-	console.log(L.right+"\n");
+	// F.up = U.down;
+	// F.right = R.left;
+	// F.down = D.up;
+	// F.left = L.right;
 	//Rotate The Plane
 	for(var i = 0; i<F.left.length; i++){
-		for(var j = 0; j<theta.length; j++){
-			cubes[F.left[i]].curTheta[j] = cubes[B.left[i]].theta[j];
-		}
+		// for(var j = 0; j<theta.length; j++){
+		// 	cubes[F.left[i]].curTheta[j] = cubes[B.right[i]].theta[j];
+		// }
 		cubes[F.left[i]].moving = 1;
 	}
-	for(var j = 0; j<theta.length; j++){
-		cubes[F.up[1]].curTheta[j] = cubes[B.up[1]].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[F.up[1]].curTheta[j] = cubes[B.up[1]].theta[j];
+	// }
 	cubes[F.up[1]].moving = 1;
-	for(var j = 0; j<theta.length; j++){
-		cubes[F.middle].curTheta[j] = cubes[B.middle].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[F.middle].curTheta[j] = cubes[B.middle].theta[j];
+	// }
 	cubes[F.middle].moving = 1;
-	for(var j = 0; j<theta.length; j++){
-		cubes[F.down[1]].curTheta[j] = cubes[B.down[1]].theta[j];
-	}
+	// for(var j = 0; j<theta.length; j++){
+	// 	cubes[F.down[1]].curTheta[j] = cubes[B.down[1]].theta[j];
+	// }
 	cubes[F.down[1]].moving = 1;
 	for(var i = 0; i<F.right.length; i++){
-		for(var j = 0; j<theta.length; j++){
-			cubes[F.right[i]].curTheta[j] = cubes[B.right[i]].theta[j];
-		}
+		// for(var j = 0; j<theta.length; j++){
+			// cubes[F.right[i]].curTheta[j] = cubes[B.right[i]].theta[j];
+		// }
 		cubes[F.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -647,17 +858,52 @@ function rotateF(){
 		var tempd = F.down;
 		var templ = F.left;
 		var tempr = F.right;
-		F.up = tempr;	//up = right
-		F.left = tempu;	//left = up
-		F.down = templ; //down = left
-		F.right = tempd;//right= down
+		F.up =    tempr; //up = right
+		F.left =  tempu; //left = up
+		F.down =  templ; //down = left
+		F.right = tempd; //right= down
 	}
+
 	//adjust other paramters
-	U.down = F.up;
-	R.left = F.right;
-	D.up = F.down;
-	L.right = F.left;
+	var indleft = intersect(U.left,U.down);
+	var indright = intersect(U.right,U.down);
+	U.down = JSON.parse(JSON.stringify(F.up));
+	U.left[indleft] = JSON.parse(JSON.stringify(F.up[intersect(F.up,F.left)]));
+	U.right[indright] = JSON.parse(JSON.stringify(F.up[intersect(F.up,F.right)]));
+
+	var indup = intersect(R.up,R.left);
+	var inddown = intersect(R.down,R.left);
+	R.left = JSON.parse(JSON.stringify(F.right));
+	R.up[indup] = JSON.parse(JSON.stringify(F.right[intersect(F.right,F.up)]));
+	R.down[inddown] = JSON.parse(JSON.stringify(F.right[intersect(F.right,F.down)]));
+
+	indleft = intersect(D.left,D.up);
+	indright = intersect(D.right,D.up);
+	D.up =   JSON.parse(JSON.stringify(F.down));
+	D.left[indleft] = JSON.parse(JSON.stringify(F.down[intersect(F.down,F.left)]));
+	D.right[indright] = JSON.parse(JSON.stringify(F.down[intersect(F.down,F.right)]));
+
+	indup = intersect(L.up,L.right);
+	inddown = intersect(L.down,L.right);
+	L.right =JSON.parse(JSON.stringify(F.left));
+	L.up[indup] = JSON.parse(JSON.stringify(F.left[intersect(F.left,F.up)]));
+	L.down[inddown] = JSON.parse(JSON.stringify(F.left[intersect(F.left,F.down)]));
+
+
+	console.log("Left",F.left,"UP",F.up,"Right",F.right,"down",F.down+"\n");
 }
+
+function intersect(a1,a2){
+	for(var i = 0; i<a1.length; i++){
+		for (var j = 0; j < a2.length; j++) {
+			if(a1[i]==a2[j]){
+				return i;
+			}
+		}
+	}
+	window.alert("Error at "+a1+"and"+a2+".");
+}
+
 
 window.addEventListener("keydown", function(event){
 	//If already pressed, prevent re-pressing
@@ -679,56 +925,8 @@ window.addEventListener("keydown", function(event){
 		case "l": rotateL(); break;
 
 		//VERTICAL EVENT
-		case "V": SHFT = 1;
-		case "v": 
-			// axis = yAxis;
-		//Rotate The Plane Use ROTATE L' AND R or L and R'
-		// for(var i = 0; i<V.left.length; i++){
-		// 	for(var j = 0; j<theta.length; j++){
-		// 		cubes[V.left[i]].curTheta[j] = cubes[R.left[i]].theta[j];
-		// 	}
-		// 	cubes[V.left[i]].moving = 1;
-		// }
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[13].curTheta[j] = cubes[R.vertic[i]].theta[j];
-		// }
-		// cubes[V.vertic[i]].moving = 1;
-		// for(var i = 0; i<V.right.length; i++){
-		// 	for(var j = 0; j<theta.length; j++){
-		// 		cubes[13].curTheta[j] = cubes[13].theta[j];
-		// 	}
-		// 	cubes[13].moving = 1;
-		// }
-		//Move the indices on the plane and change other plane's indices
-		//Rotating face clockwise means right = up, up = left, left = down, down = right, middle = veritc, vertic = middle;
-
-		//USE L' and R or R and L'
-		// if(!SHFT){
-		// 	var temp = []; var temp2 = [];
-		// 	temp = V.right;
-		// 	V.right = V.up;   //right = up
-		// 	temp2 = V.down;
-		// 	V.down = temp;  //down  = right
-		// 	temp = V.left; 
-		// 	V.left = temp2; //left = down
-		// 	V.up  = temp;   //up = left
-		// }
-		// //Rotating face anticlockwise means right = down, down = left, left = up, up = right, middle = vertic, vertic = middle;
-		// else{
-		// 	var temp = []; var temp2 = [];
-		// 	temp = V.up;
-		// 	V.up = V.right;	//up = right
-		// 	temp2 = V.left;
-		// 	V.left = temp;	//left = up
-		// 	temp = V.down;
-		// 	V.down = temp2; //down = left
-		// 	V.right = temp//right= down
-		// }
-		// //adjust other paramters
-		// U.vertic = V.up;
-		// F.vertic = V.right;
-		// D.vertic = V.down;
-		// B.vertic = V.left;
+		case "V": rotateCubeVert(); vPrime=2; break;
+		case "v": var temp = reverse; reverse = 1; rotateCubeVert(); reverse = temp; v=2; 
 		break;
 
 		//RIGHT EVENT
@@ -740,26 +938,8 @@ window.addEventListener("keydown", function(event){
 		case "u": rotateU(); break;
 
 		//CASE M -- CONTINUE LATER
-		case "M": SHFT = 1;
-		case "m":
-		// axis = xAxis+3;
-		//Rotate The Plane USE U' and D and U and D'
-		// for(var i = 0; i<M.left.length; i++){
-		// 	for(var j = 0; j<theta.length; j++){
-		// 		cubes[M.left[i]].curTheta[j] = cubes[D.left[i]].theta[j];
-		// 	}
-		// 	cubes[M.left[i]].moving = 1;
-		// }
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[M.middle].curTheta[j] = cubes[D.middle].theta[j];
-		// }
-		// cubes[M.middle].moving = 1;
-		// for(var i = 0; i<M.right.length; i++){
-		// 	for(var j = 0; j<theta.length; j++){
-		// 		cubes[M.right[i]].curTheta[j] = cubes[D.right[i]].theta[j];
-		// 	}
-		// 	cubes[M.right[i]].moving = 1;
-		// }
+		case "M": reverse=1; rotateCubeHoriz(); mPrime = 2; break;
+		case "m": reverse=0; rotateCubeHoriz(); m=2;
 		break;
 
 		//DOWN CASE
@@ -770,41 +950,94 @@ window.addEventListener("keydown", function(event){
 		case "B": SHFT = 1;
 		case "b": rotateB(); break;
 
-		case "O": SHFT = 1;
-		case "o":
-		// axis = zAxis;
-		//Rotate The Plane - fix later F' and B, or B' and F
-		// for(var i = 0; i<O.left.length; i++){
-		// 	for(var j = 0; j<theta.length; j++){
-		// 		cubes[O.left[i]].curTheta[j] = cubes[B.left[i]].theta[j];
-		// 	}
-		// 	cubes[O.left[i]].moving = 1;
-		// }
-		// for(var i = 0; i<O.vertic.length; i++){
-		// 	for(var j = 0; j<theta.length; j++){
-		// 		cubes[O.vertic[i]].curTheta[j] = cubes[F.vertic[i]].theta[j];
-		// 	}
-		// 	cubes[O.vertic[i]].moving = 1;
-		// }
-		// for(var i = 0; i<O.right.length; i++){
-		// 	for(var j = 0; j<theta.length; j++){
-		// 		cubes[O.right[i]].curTheta[j] = cubes[B.right[i]].theta[j];
-		// 	}
-		// 	cubes[O.right[i]].moving = 1;
-		// }
-		break;
+		case "O": SHFT = 1; oPrime=2; break;
+		case "o": o=2; break;
 		case "F": SHFT = 1;
 		case "f": rotateF(); break;
+		case "Enter" : if(!enter){
+			enter = 1;
+			ind = parseInt(document.getElementById("initialNum").value);
+			console.log(ind);
+		} event.preventDefault(); return;
+		default : return;
 	}
 	// The Shift Key Makes it prime
 	if(SHFT){
-		for(var i = 0; i<cubes.length; i++)
+		for(var i = 0; i<cubes.length; i++){
+			if(moving)
+				console.log(i);
+	        cubes[i].xAxis = 3;
+	        cubes[i].yAxis = 4;
+	        cubes[i].zAxis = 5;
 			cubes[i].axis = (cubes[i].axis+3)%6;
+		}
 		SHFT=0;
 	}
-
+	if(solvedAll())
+		document.getElementById("Title").innerHTML="YOU SOLVED IT!";
 	event.preventDefault();
 }, true);
+
+function doRotation(){
+	var index = Math.floor(Math.random()*(8));
+	SHFT = 0;
+	console.log(index);
+	switch(index){
+		case 0: rotateL(); break;
+		case 1: rotateR(); break;
+		case 2: rotateU(); break;
+		case 3: rotateD(); break;
+		case 4: rotateF(); break;
+		case 5: rotateB(); break;
+		case 6: rotateCubeVert(); break;
+		case 7: rotateCubeHoriz(); break;
+		default : return;
+	}
+}
+
+function solvedAll(){
+	return solved(F)&&solved(B)&&solved(U)&&solved(D)&&solved(L)&&solved(R);
+}
+
+function contains(value,array){
+	for(var i = 0; i<array.length; i++){
+		if(value==array[i]){
+			return true;
+		}
+	}
+	return false;
+}
+
+function SHFTY(){
+	if(SHFT){
+		for(var i = 0; i<cubes.length; i++){
+			cubes[i].axis = (cubes[i].axis+3)%6;
+		}
+		SHFT=0;
+	}
+}
+
+function solved(obj){
+	var aF=	obj.solved;
+	for(var i = 0; i<obj.left.length; i++){
+		if(!contains(obj.left[i],aF))
+			return false;
+	}
+	for(var i = 0; i<obj.up.length; i++){
+		if(!contains(obj.up[i],aF))
+			return false;
+	}
+	for(var i = 0; i<obj.down.length; i++){
+		if(!contains(obj.down[i],aF))
+			return false;
+	}
+	for(var i = 0; i<obj.right.length; i++){
+		if(!contains(obj.right[i],aF))
+			return false;
+	}
+	return true;
+
+}
 
 function render(){
 	gl.depthFunc(gl.LEQUAL); 
@@ -812,40 +1045,95 @@ function render(){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	mvMatrix = lookAt(eye, at, up);
 	pMatrix  = ortho (left, right, bottom, ytop, near, far);
-
+	// mvMatrix = mult(cubes[0].grMatrix,mvMatrix);
     gl.uniformMatrix4fv( mvMatrixLoc, false, flatten(mvMatrix) );
     gl.uniformMatrix4fv( pMatrixLoc, false, flatten(pMatrix) );
+    if(noneMoving()&&ind>0){
+    	console.log("Done");
+    	doRotation();
+    	ind--;
+    }
+    else if(mPrime>0&&noneMoving()){
+    	switch(mPrime){
+    	case 2: rotateU(); SHFTY(); break;
+    	case 1: SHFT = 1; rotateD(); SHFTY(); break;
+    	}
+    	mPrime--;
+    }
+    else if(m>0&&noneMoving()){
+    	switch(m){
+    	case 2: SHFT = 1; rotateU(); SHFTY(); break;
+    	case 1: rotateD(); SHFTY(); break;
+    	}
+    	m--;
+    }
+    else if(v>0&&noneMoving()){
+    	switch(v){
+    	case 2: SHFT = 1; rotateL(); SHFTY(); break;
+    	case 1: rotateR(); SHFTY(); break;
+    	}
+    	v--;
+    }
+    else if(vPrime>0&&noneMoving()){
+    	switch(vPrime){
+    	case 2: SHFT = 1; rotateR(); SHFTY(); break;
+    	case 1: rotateL(); SHFTY(); break;
+    	}
+    	vPrime--;
+    }
+    else if(o>0&&noneMoving()){
+    	switch(o){
+    	case 2: SHFT = 1; rotateF(); SHFTY(); break;
+    	case 1: rotateB(); SHFTY(); break;
+    	}
+    	o--;
+    }
+    else if(oPrime>0&&noneMoving()){
+    	switch(oPrime){
+    	case 2: SHFT = 1; rotateB(); SHFTY(); break;
+    	case 1: rotateF(); SHFTY(); break;
+    	}
+    	oPrime--;
+    }
 
 	for(var i = 0; i<cubes.length; i++){
 		if(cubes[i].moving&&cubes[i].axis>2){
-			cubes[i].theta[cubes[i].axis-3]-=2.0;
+			cubes[i].theta-=10.0;
 			switch(cubes[i].axis){
-				case 3: cubes[i].rMatrix=mult(cubes[i].rMatrix,rotate(cubes[i].theta[0],1.0,0.0,0.0)); break;
-				case 4: cubes[i].rMatrix=mult(cubes[i].rMatrix,rotate(cubes[i].theta[1],0.0,1.0,0.0)); break;
-				case 5: cubes[i].rMatrix=mult(cubes[i].rMatrix,rotate(cubes[i].theta[2],0.0,0.0,1.0)); break;
+				case 3: cubes[i].rMatrixX=mult(cubes[i].rMatrixX,rotate(-10,1.0,0.0,0.0)); break;
+				case 4: cubes[i].rMatrixY=mult(cubes[i].rMatrixY,rotate(-10,0.0,1.0,0.0)); break;
+				case 5: cubes[i].rMatrixZ=mult(cubes[i].rMatrixZ,rotate(-10,0.0,0.0,1.0)); break;
 			}
-			
-			if((cubes[i].theta[cubes[i].axis-3]-cubes[i].curTheta[cubes[i].axis-3])%90==0){
-				cubes[i].theta[cubes[i].axis-3] = cubes[i].theta[cubes[i].axis-3]%360;
+			if((cubes[i].theta)%90==0){
+				cubes[i].theta = 0;
 				cubes[i].moving = 0;
-
 			}
 		}
 		else if(cubes[i].moving)   {
-		    cubes[i].theta[cubes[i].axis] += 2.0;
+		    cubes[i].theta += 10.0;
 			switch(cubes[i].axis){
-				case 0: cubes[i].rMatrix=mult(cubes[i].rMatrix,rotate(cubes[i].theta[0],1.0,0.0,0.0)); break;
-				case 1: cubes[i].rMatrix=mult(cubes[i].rMatrix,rotate(cubes[i].theta[1],0.0,1.0,0.0)); break;
-				case 2: cubes[i].rMatrix=mult(cubes[i].rMatrix,rotate(cubes[i].theta[2],0.0,0.0,1.0)); break;
+				case 0: cubes[i].rMatrixX=mult(cubes[i].rMatrixX,rotate(10,1.0,0.0,0.0)); break;
+				case 1: cubes[i].rMatrixY=mult(cubes[i].rMatrixY,rotate(10,0.0,1.0,0.0)); break;
+				case 2: cubes[i].rMatrixZ=mult(cubes[i].rMatrixZ,rotate(10,0.0,0.0,1.0)); break;
 			}
-		    if((cubes[i].theta[cubes[i].axis]-cubes[i].curTheta[cubes[i].axis])%90==0){
-		    	cubes[i].theta[cubes[i].axis] = cubes[i].theta[cubes[i].axis]%360;
+		    if((cubes[i].theta)%90==0){
+		    	cubes[i].theta = 0;
 			    cubes[i].moving = 0;
-
 		    }
+
 		}
-		cubes[i].theta = 0;
-		gl.uniformMatrix4fv( rMatrixLoc, false, flatten(cubes[i].rMatrix));
+
+		if(g){
+			cubes[i].grMatrix = mult(mult(mult(cubes[i].rMatrixZ,cubes[i].rMatrixY),cubes[i].rMatrixX),cubes[i].grMatrix);
+		}
+		else{
+			cubes[i].rMatrix =mult(mult(mult(cubes[i].rMatrixZ,cubes[i].rMatrixY),cubes[i].rMatrixX),cubes[i].rMatrix);
+		}
+
+		gl.uniformMatrix4fv(grMatrixLoc, false, flatten(cubes[i].grMatrix));
+		gl.uniformMatrix4fv(rMatrixLoc, false, flatten(cubes[i].rMatrix));
+		cubes[i].rMatrixX = mat4(); cubes[i].rMatrixY = mat4(); cubes[i].rMatrixZ = mat4();
+
 	    // gl.uniform3fv(thetaLoc, cubes[i].theta);
 	    gl.drawArrays( gl.TRIANGLES, 0+NumVertices*i, NumVertices);
 	}
@@ -854,27 +1142,61 @@ function render(){
 	
 }
 
-function keyPressed(){
-	if(L)
-		numKey=1;
-	else if(R)
-		numKey=2;
-	else if(M)
-		numKey=3;
-	else if(D)
-		numKey=4;
-	else if(U)
-		numKey=5;
-	else if(B)
-		numKey=6;
-	else if(F)
-		numKey=7;
-	else if(V)
-		numKey=8;
-	else
-		numKey=9;
-	return L||R||M||D||U||B||F||V||O;
+function getCurrentState(){
+	var str="";
+	for(var i = 0; i<cubes.length; i++)
+		str = str + JSON.stringify(cubes[i].rMatrix)+"@"+JSON.stringify(cubes[i].grMatrix)+"%";
+	return str;
 }
+
+function loadCurrentState(string){
+	var f = 0;
+	for(var i = 0; i<cubes.length; i++){
+		var index = string.indexOf("%");
+		if(index<0)
+			window.alert(index);
+		var cubeStr = string.substring(f,index);
+		cubes[i].rMatrix = JSON.parse(cubeStr.substring(0,cubeStr.indexOf("@")));
+		cubes[i].grMatrix = JSON.parse(cubeStr.substring(cubeStr.indexOf("@")+1,cubeStr.indexOf("%")));
+		string = string.substring(index);
+		f=index;
+	}
+}
+
+
+function myFunction() {
+    var x = document.getElementById("myFile");
+    if(x.files.length==0)
+    	return;
+   	var f = x.files[0];
+   	var reader = new FileReader();
+   	loadCurrentState(JSON.stringify(reader.readAsText(f,'UTF-8')));
+    x.disabled = true;
+}
+
+function checkIt(){
+var textFile = null,
+  makeTextFile = function (text) {
+    var data = new Blob([text], {type: 'text/plain'});
+
+    // If we are replacing a previously generated file we need to
+    // manually revoke the object URL to avoid memory leaks.
+    if (textFile !== null) {
+      window.URL.revokeObjectURL(textFile);
+    }
+
+    textFile = window.URL.createObjectURL(data);
+
+    return textFile;
+  };
+  var create = document.getElementById("create");
+
+  create.addEventListener('click', function () {
+    var link = document.getElementById('downloadlink');
+    link.href = makeTextFile(getCurrentState());
+    link.style.display = 'block';
+  }, false);
+};
 
 function buildCube(i)
 {
@@ -890,7 +1212,7 @@ function buildCube(i)
 	cube.vertices = points;
 	cube.colors   = colors;
 	points = []; colors = [];
-	cube.theta    = [0,0,0];
+	cube.theta    = 0;
 	cube.curTheta = [0,0,0];
 	cube.moving   = 0;
 	cube.axis = 0;
@@ -900,6 +1222,10 @@ function buildCube(i)
 	cube.xState= 0;
 	cube.yState= 0;
 	cube.zState= 0;
+	cube.grMatrix = mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+	cube.rMatrixX = mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+	cube.rMatrixY = mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+	cube.rMatrixZ = mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 	cube.rMatrix = mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 	//Add cube to cube array
     cubes.push(cube);

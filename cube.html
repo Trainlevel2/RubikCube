@@ -7,6 +7,7 @@
 		uniform mat4 mvMatrix;
 		uniform mat4 pMatrix;
 		uniform mat4 rMatrix;
+		uniform mat4 grMatrix;
 		varying vec4 fColor;
 
 		// uniform vec3 theta;
@@ -42,7 +43,7 @@
 		  // p = multq(r, multq(p, invq(r)));	// rotated point quaternion
 		  // gl_Position = vec4( p.yzw, 1.0); 	// convert back to homogeneous coordinates
 
-		  gl_Position = rMatrix*vPosition;
+		  gl_Position = grMatrix*rMatrix*vPosition;
 		  gl_Position.z = -gl_Position.z;
 
 		  gl_Position=pMatrix*mvMatrix*gl_Position;
@@ -68,17 +69,23 @@
 	<script type="text/javascript" src="initShaders.js"></script>
 	<script type="text/javascript" src="cube.js"></script>
 	<body>
-		<h1>Cubing Practice</h1>
+		<h1 id="Title">Cubing Practice</h1>
 		<canvas width="600" height="500" id="cube">
 			Oops ... your browser doesn't support the HTML5 canvas element
 		</canvas>
 		<br>
+		<form>Enter the number of initial rotations:<br>
+		<input type="text" id="initialNum"></form>
 		<button id="xButton">Rotate X</button>
 		<button id="yButton">Rotate Y</button>
-		<button id="zButton">Rotate Z</button>
+		<!--<button id="zButton">Rotate Z</button>-->
 		<button id="Reverse">Reverse Direction</button>
 		<br>
 		<br>
-		<p>Use F,O,B for Front, Back, and inbetween. Use U,M,D for Up, Middle, Down. Use L,V,R for Left, Middle, Right. Lower-case letters are clockwise, Upper-case letters are counter-clockwise.<
+		<p>Use F,O,B for Front, Back, and inbetween. Use U,M,D for Up, Middle, Down. Use L,V,R for Left, Middle, Right. Lower-case letters are clockwise, Upper-case letters are counter-clockwise.</p>
+		<button id="create">Save state to txt</button>
+		<a download="info.txt" id="downloadlink<input type="file" id="myFile" style="display: none">Download</a>
+		<br>
+		<input type="file" id="myFile" ><button onclick="myFunction()">Load</button>
 	</body>
 </html>

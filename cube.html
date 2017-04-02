@@ -43,7 +43,7 @@
 		  // p = multq(r, multq(p, invq(r)));	// rotated point quaternion
 		  // gl_Position = vec4( p.yzw, 1.0); 	// convert back to homogeneous coordinates
 
-		  gl_Position = grMatrix*rMatrix*vPosition;
+		  gl_Position = rMatrix*vPosition;
 		  gl_Position.z = -gl_Position.z;
 
 		  gl_Position=pMatrix*mvMatrix*gl_Position;
@@ -82,10 +82,10 @@
 		<button id="Reverse">Reverse Direction</button>
 		<br>
 		<br>
-		<p>Use F,O,B for Front, Back, and inbetween. Use U,M,D for Up, Middle, Down. Use L,V,R for Left, Middle, Right. Lower-case letters are clockwise, Upper-case letters are counter-clockwise.</p>
+		<p>Use F,O,B for Front, Back, and inbetween. Use U,M,D for Up, Middle, Down. Use L,V,R for Left, Middle, Right. Lower-case letters are clockwise, Upper-case letters are counter-clockwise. Protip: O,M, and V are not used as much in cubing.</p>
 		<button id="create">Save state to txt</button>
 		<a download="info.txt" id="downloadlink"><input type="file" id="myFile" style="display: none">Download</a>
 		<br>
-		<input type="file" id="myFile" ><button onclick="myFunction()">Load</button>
+		<input type="file" id="myFile" ><button onclick="myFunction()" id="but">Load</button>
 	</body>
 </html>

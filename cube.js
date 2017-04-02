@@ -17,7 +17,7 @@ var thetaLoc;
 var moving = 0;
 var reverse = 0;
 var rMatrixLoc;
-
+var start = false;
 var enter = 0;
 var ind = 0;
 
@@ -925,8 +925,8 @@ window.addEventListener("keydown", function(event){
 		case "l": rotateL(); break;
 
 		//VERTICAL EVENT
-		case "V": rotateCubeVert(); vPrime=2; break;
-		case "v": var temp = reverse; reverse = 1; rotateCubeVert(); reverse = temp; v=2; 
+		case "V": g=1; rotateCubeVert(); vPrime=2; break;
+		case "v": var temp = reverse; reverse = 1; g=1; rotateCubeVert(); reverse = temp; v=2; 
 		break;
 
 		//RIGHT EVENT
@@ -938,8 +938,8 @@ window.addEventListener("keydown", function(event){
 		case "u": rotateU(); break;
 
 		//CASE M -- CONTINUE LATER
-		case "M": reverse=1; rotateCubeHoriz(); mPrime = 2; break;
-		case "m": reverse=0; rotateCubeHoriz(); m=2;
+		case "M": reverse=1; g=1; rotateCubeHoriz(); mPrime = 2; break;
+		case "m": reverse=0; g=1; rotateCubeHoriz(); m=2;
 		break;
 
 		//DOWN CASE
@@ -973,8 +973,6 @@ window.addEventListener("keydown", function(event){
 		}
 		SHFT=0;
 	}
-	if(solvedAll())
-		document.getElementById("Title").innerHTML="YOU SOLVED IT!";
 	event.preventDefault();
 }, true);
 
@@ -989,14 +987,49 @@ function doRotation(){
 		case 3: rotateD(); break;
 		case 4: rotateF(); break;
 		case 5: rotateB(); break;
-		case 6: rotateCubeVert(); break;
-		case 7: rotateCubeHoriz(); break;
+		case 6: g=1; rotateCubeVert(); break;
+		case 7: g=1; rotateCubeHoriz(); break;
 		default : return;
 	}
 }
 
 function solvedAll(){
-	return solved(F)&&solved(B)&&solved(U)&&solved(D)&&solved(L)&&solved(R);
+	// return solved(F)&&solved(B)&&solved(U)&&solved(D)&&solved(L)&&solved(R);
+	var mat = [];
+	mat.push(mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1));
+	for (var i = 1; i<4; i++) {
+		for(var j=0; j<2; j++){
+			for(var k=0; k<2; k++){
+				for(var l=0; l<2; l++){
+					if(!(j==k&&k==l))
+						mat.push(mult(mat[0],rotate(90*i,j+0.0,k+0.0,l+0.0)));
+				}
+			}
+		}
+	}
+	for(var i=0; i<mat.length;i++){
+		console.log("Mat"+i+"="+mat[i]);
+	}
+	var count = 0;
+	for(var l=0; l<mat.length; mat++){
+		for(var i=0; i<cubes.length; i++){
+			console.log(cubes[i].rMatrix);
+			for (var j=0; j<cubes[i].rMatrix.length; j++){
+				for (var k=0; k<cubes[i].rMatrix[j].length; k++){
+					if(Math.round(cubes[i].rMatrix[j][k])!=Math.round(mat[l][j][k])){
+						// console.log((cubes[i].rMatrix[j][k])+"vs"+mat[l][j][k]);
+						count++;					
+					}
+				}
+			}
+		}
+		if(count){
+			count=0;
+		}
+		else
+			return true;
+	}
+	return false;
 }
 
 function contains(value,array){
@@ -1017,27 +1050,27 @@ function SHFTY(){
 	}
 }
 
-function solved(obj){
-	var aF=	obj.solved;
-	for(var i = 0; i<obj.left.length; i++){
-		if(!contains(obj.left[i],aF))
-			return false;
-	}
-	for(var i = 0; i<obj.up.length; i++){
-		if(!contains(obj.up[i],aF))
-			return false;
-	}
-	for(var i = 0; i<obj.down.length; i++){
-		if(!contains(obj.down[i],aF))
-			return false;
-	}
-	for(var i = 0; i<obj.right.length; i++){
-		if(!contains(obj.right[i],aF))
-			return false;
-	}
-	return true;
+// function solved(obj){
+// 	var aF=	obj.solved;
+// 	for(var i = 0; i<obj.left.length; i++){
+// 		if(!contains(obj.left[i],aF))
+// 			return false;
+// 	}
+// 	for(var i = 0; i<obj.up.length; i++){
+// 		if(!contains(obj.up[i],aF))
+// 			return false;
+// 	}
+// 	for(var i = 0; i<obj.down.length; i++){
+// 		if(!contains(obj.down[i],aF))
+// 			return false;
+// 	}
+// 	for(var i = 0; i<obj.right.length; i++){
+// 		if(!contains(obj.right[i],aF))
+// 			return false;
+// 	}
+// 	return true;
 
-}
+// }
 
 function render(){
 	gl.depthFunc(gl.LEQUAL); 
@@ -1095,7 +1128,7 @@ function render(){
     	}
     	oPrime--;
     }
-
+    var gfinal=0;
 	for(var i = 0; i<cubes.length; i++){
 		if(cubes[i].moving&&cubes[i].axis>2){
 			cubes[i].theta-=10.0;
@@ -1107,6 +1140,10 @@ function render(){
 			if((cubes[i].theta)%90==0){
 				cubes[i].theta = 0;
 				cubes[i].moving = 0;
+				if(g) gfinal=1;
+				if(solvedAll()&&start!=false)
+					document.getElementById("Title").innerHTML="YOU SOLVED IT!";
+				start = true;
 			}
 		}
 		else if(cubes[i].moving)   {
@@ -1119,16 +1156,21 @@ function render(){
 		    if((cubes[i].theta)%90==0){
 		    	cubes[i].theta = 0;
 			    cubes[i].moving = 0;
+			    if(g) gfinal=1;
+				if(solvedAll()&&start!=false)
+					document.getElementById("Title").innerHTML="YOU SOLVED IT!";
+				start = true;
 		    }
 
 		}
 
-		if(g){
-			cubes[i].grMatrix = mult(mult(mult(cubes[i].rMatrixZ,cubes[i].rMatrixY),cubes[i].rMatrixX),cubes[i].grMatrix);
-		}
-		else{
+		// if(g){
+		// 	if(gfinal) g=0;
+		// 	cubes[i].grMatrix = mult(mult(mult(cubes[i].rMatrixZ,cubes[i].rMatrixY),cubes[i].rMatrixX),cubes[i].grMatrix);
+		// }
+		// else{
 			cubes[i].rMatrix =mult(mult(mult(cubes[i].rMatrixZ,cubes[i].rMatrixY),cubes[i].rMatrixX),cubes[i].rMatrix);
-		}
+		// }
 
 		gl.uniformMatrix4fv(grMatrixLoc, false, flatten(cubes[i].grMatrix));
 		gl.uniformMatrix4fv(rMatrixLoc, false, flatten(cubes[i].rMatrix));
@@ -1163,14 +1205,21 @@ function loadCurrentState(string){
 	}
 }
 
-
 function myFunction() {
     var x = document.getElementById("myFile");
-    if(x.files.length==0)
+    if(x.files.length==0){
+    	console.log(x.files);
     	return;
+    }
    	var f = x.files[0];
    	var reader = new FileReader();
-   	loadCurrentState(JSON.stringify(reader.readAsText(f,'UTF-8')));
+    reader.onload = function(e) {
+        //console.log(e.target.result)
+        console.log("loaded");
+        loadCurrentState(reader.result);
+    };
+    // Finally read the file as a text string
+    reader.readAsText(file);
     x.disabled = true;
 }
 

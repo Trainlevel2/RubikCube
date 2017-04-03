@@ -782,8 +782,8 @@ window.addEventListener("keydown", function(event){
 		case "u": rotateU(); break;
 
 		//CASE M -- CONTINUE LATER
-		case "V": reverse=1; g=1; rotateCubeHoriz(); mPrime = 2; break;
-		case "v": reverse=0; g=1; rotateCubeHoriz(); m=2;
+		case "E": var temp = reverse; reverse=1; g=1; rotateCubeHoriz(); reverse = temp; mPrime = 2; break;
+		case "e": var temp = reverse; reverse=0; g=1; rotateCubeHoriz(); reverse = temp; m=2;
 		break;
 
 		//DOWN CASE
@@ -825,14 +825,18 @@ function doRotation(){
 	SHFT = 0;
 	console.log(index);
 	switch(index){
-		case 0: rotateL(); break;
-		case 1: rotateR(); break;
-		case 2: rotateU(); break;
-		case 3: rotateD(); break;
-		case 4: rotateF(); break;
-		case 5: rotateB(); break;
+		case 0: rotateL(); SHFTY(); break;
+		case 1: rotateR(); SHFTY(); break;
+		case 2: rotateU(); SHFTY(); break;
+		case 3: rotateD(); SHFTY(); break;
+		case 4: rotateF(); SHFTY(); break;
+		case 5: rotateB(); SHFTY(); break;
 		case 6: g=1; rotateCubeVert(); break;
 		case 7: g=1; rotateCubeHoriz(); break;
+		case 8: v=2; break;
+		case 9: vPrime=2; break;
+		case 8: m=2; break;
+		case 9: mPrime=2; break;
 		default : return;
 	}
 }
@@ -943,6 +947,18 @@ function render(){
     	case 1: SHFT = 1; rotateD(); SHFTY(); break;
     	}
     	mPrime--;
+    	// var temp = reverse; reverse=0; g=1; rotateCubeHoriz(); reverse = temp; rotateU(); SHFTY(); 
+    	// SHFT = 1; rotateD(); SHFTY();
+    	// for(var i = 0; i<cubes.length; i++){
+    	// 	if(isIn(i,U)||isIn(i,D))
+    	// 		cubes[i].moving = 0;
+    	// 	else{
+    	// 		cubes[i].moving = 1;
+    	// 		cubes[i].axis = 1;
+    	// 	}
+    	// }
+
+    	// mPrime=0;
     }
     else if(m>0&&noneMoving()){
     	switch(m){
@@ -950,6 +966,17 @@ function render(){
     	case 1: rotateD(); SHFTY(); break;
     	}
     	m--;
+    	// var temp = reverse; reverse=1; g=1; rotateCubeHoriz(); reverse = temp;
+    	// SHFT = 1; rotateU(); SHFTY(); rotateD(); SHFTY();
+    	// for(var i = 0; i<cubes.length; i++){
+    	// 	if(isIn(i,U)||isIn(i,D))
+    	// 		cubes[i].moving = 0;
+    	// 	else{
+    	// 		cubes[i].moving = 1;
+    	// 		cubes[i].axis = 4;
+    	// 	}
+    	// }
+    	// m=0;
     }
     else if(v>0&&noneMoving()){
     	// switch(v){
@@ -1040,7 +1067,7 @@ function render(){
 				if(solvedAll()&&start!=false)
 					document.getElementById("Title").innerHTML="Rubik's Cube Master (SOLVED IT!)";
 				start = true;
-				if(start){
+				if(start&&!solvedAll()){
 					document.getElementById("Title").innerHTML="Rubik's Cube Practice";
 					start = false
 				}

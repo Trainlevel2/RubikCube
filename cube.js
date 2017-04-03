@@ -300,8 +300,8 @@ function rotateCubeVert(){
     		rotateObjCo(R);
     	}
     	else{
-			console.log("F.left"+F.left);
-			console.log("U.left"+U.left);
+			// console.log("F.left"+F.left);
+			// console.log("U.left"+U.left);
     		var tempF = JSON.parse(JSON.stringify(F));
     		var tempD = JSON.parse(JSON.stringify(D));
     		var tempB = JSON.parse(JSON.stringify(B));
@@ -317,17 +317,17 @@ function rotateCubeVert(){
     		reverse = 0;
     		rotateObjCo(R);
     		reverse = 1;
-    		console.log("L.Left",L.left,"UP",L.up,"Right",L.right,"down",L.down+"\n");
+    		// console.log("L.Left",L.left,"UP",L.up,"Right",L.right,"down",L.down+"\n");
     		rotateObjCo(L);
     		reverse = 0;
-			console.log("L.Left",L.left,"UP",L.up,"Right",L.right,"down",L.down+"\n");
-			console.log("F.left"+F.left);
+			// console.log("L.Left",L.left,"UP",L.up,"Right",L.right,"down",L.down+"\n");
+			// console.log("F.left"+F.left);
     	}
 }
 
 function rotateL(){
-	console.log("RotateL");
-	console.log("Left",L.left,"UP",L.up,"Right",L.right,"down",L.down+"\n");
+	// console.log("RotateL");
+	// console.log("Left",L.left,"UP",L.up,"Right",L.right,"down",L.down+"\n");
    	for(var i = 0; i<cubes.length; i++){
 		cubes[i].axis = 3;
    	}
@@ -396,8 +396,8 @@ function rotateL(){
 
 function rotateR(){
 
-	console.log("RotateR");
-	console.log("Left",R.left,"UP",R.up,"Right",R.right,"down",R.down+"\n");
+	// console.log("RotateR");
+	// console.log("Left",R.left,"UP",R.up,"Right",R.right,"down",R.down+"\n");
 
    	for(var i = 0; i<cubes.length; i++)
 		cubes[i].axis = 0;
@@ -462,8 +462,8 @@ function rotateR(){
 }
 
 function rotateU(){
-	console.log("RotateU");
-	console.log("Left",U.left,"UP",U.up,"Right",U.right,"down",U.down+"\n");
+	// console.log("RotateU");
+	// console.log("Left",U.left,"UP",U.up,"Right",U.right,"down",U.down+"\n");
 	for(var i = 0; i<cubes.length; i++)
 		cubes[i].axis = 1;
 	//Rotate The Plane
@@ -527,8 +527,8 @@ function rotateU(){
 }
 
 function rotateD(){
-	console.log("RotateD");
-	console.log("Left",D.left,"UP",D.up,"Right",D.right,"down",D.down+"\n");
+	// console.log("RotateD");
+	// console.log("Left",D.left,"UP",D.up,"Right",D.right,"down",D.down+"\n");
 	for(var i = 0; i<cubes.length; i++)
 		cubes[i].axis = 4;
 	//Initialize Parameters
@@ -594,8 +594,8 @@ function rotateD(){
 
 function rotateB(){
 
-	console.log("RotateB");
-	console.log("Left",B.left,"UP",B.up,"Right",B.right,"down",B.down+"\n");
+	// console.log("RotateB");
+	// console.log("Left",B.left,"UP",B.up,"Right",B.right,"down",B.down+"\n");
 	for(var i = 0; i<cubes.length; i++)
 		cubes[i].axis = 2;
 	//Initialize Paramters
@@ -665,8 +665,8 @@ function rotateB(){
 }
 
 function rotateF(){
-	console.log("RotateF");
-	console.log("Left",F.left,"UP",F.up,"Right",F.right,"down",F.down+"\n");
+	// console.log("RotateF");
+	// console.log("Left",F.left,"UP",F.up,"Right",F.right,"down",F.down+"\n");
 	for(var i = 0; i<cubes.length; i++)
 		cubes[i].axis = 5;
 	//Initialize Parameters
@@ -734,7 +734,7 @@ function rotateF(){
 	L.down[inddown] = JSON.parse(JSON.stringify(F.left[intersect(F.left,F.down)]));
 
 
-	console.log("Left",F.left,"UP",F.up,"Right",F.right,"down",F.down+"\n");
+	// console.log("Left",F.left,"UP",F.up,"Right",F.right,"down",F.down+"\n");
 }
 
 function intersect(a1,a2){
@@ -801,7 +801,7 @@ window.addEventListener("keydown", function(event){
 		case "Enter" : if(!enter){
 			enter = 1;
 			ind = parseInt(document.getElementById("initialNum").value);
-			console.log(ind);
+			// console.log(ind);
 		} event.preventDefault(); return;
 		default : return;
 	}
@@ -850,12 +850,12 @@ function solvedAll(){
 		else{
 			ind2 = i+1;
 		}
-		console.log(matRound(cubes[i].rMatrix)+"vs");
-		console.log(matRound(cubes[i+1].rMatrix));
+		// console.log(matRound(cubes[i].rMatrix)+"vs");
+		// console.log(matRound(cubes[i+1].rMatrix));
 		for (var j=0; j<cubes[i].rMatrix.length; j++){
 			for (var k=0; k<cubes[i].rMatrix[j].length; k++){
 				if(Math.round(cubes[i].rMatrix[j][k])!==Math.round(cubes[ind2].rMatrix[j][k])){
-					console.log("i"+i+"i+1"+(i+1));
+					// console.log("i"+i+"i+1"+(i+1));
 					count++;
 				}
 			}
@@ -965,10 +965,11 @@ function render(){
 				cubes[i].theta = 0;
 				cubes[i].moving = 0;
 				if(g) gfinal=1;
-				if(solvedAll()&&start!=false)
+				if(solvedAll()&&start!=false){
 					document.getElementById("Title").innerHTML="Rubik's Cube Master (SOLVED IT!)";
+				}
 				start = true;
-				if(start){
+				if(start&&!solvedAll()){
 					document.getElementById("Title").innerHTML="Rubik's Cube Practice";
 					start = false
 				}

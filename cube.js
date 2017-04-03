@@ -769,8 +769,8 @@ window.addEventListener("keydown", function(event){
 		case "l": rotateL(); break;
 
 		//VERTICAL EVENT
-		case "V": g=1; rotateCubeVert(); vPrime=2; break;
-		case "v": var temp = reverse; reverse = 1; g=1; rotateCubeVert(); reverse = temp; v=2; 
+		case "M": vPrime=2; break;
+		case "m": v=2; 
 		break;
 
 		//RIGHT EVENT
@@ -782,8 +782,8 @@ window.addEventListener("keydown", function(event){
 		case "u": rotateU(); break;
 
 		//CASE M -- CONTINUE LATER
-		case "M": reverse=1; g=1; rotateCubeHoriz(); mPrime = 2; break;
-		case "m": reverse=0; g=1; rotateCubeHoriz(); m=2;
+		case "V": reverse=1; g=1; rotateCubeHoriz(); mPrime = 2; break;
+		case "v": reverse=0; g=1; rotateCubeHoriz(); m=2;
 		break;
 
 		//DOWN CASE
@@ -894,7 +894,35 @@ function SHFTY(){
 	}
 }
 
+function isIn(val,obj){
+	for(var i = 0; i<obj.up.length; i++){
+		if(obj.up[i]==val)
+			return true;
+	}
+	for(var i = 0; i<obj.down.length; i++){
+		if(obj.down[i]==val)
+			return true;
+	}
+	for(var i = 0; i<obj.left.length; i++){
+		if(obj.left[i]==val)
+			return true;
+	}
+	for(var i = 0; i<obj.right.length; i++){
+		if(obj.right[i]==val)
+			return true;
+	}
+	if(obj.middle==val)
+		return true;
+	return false;
+}
 
+function allMoving(){
+	for(var i = 0; i<cubes.length; i++){
+		if(cubes[i].moving!=1)
+			return false;
+	}
+	return true;
+}
 function render(){
 	gl.depthFunc(gl.LEQUAL); 
 
@@ -924,18 +952,41 @@ function render(){
     	m--;
     }
     else if(v>0&&noneMoving()){
-    	switch(v){
-    	case 2: SHFT = 1; rotateL(); SHFTY(); break;
-    	case 1: rotateR(); SHFTY(); break;
+    	// switch(v){
+    	// case 2: SHFT = 1; rotateL(); SHFTY(); break;
+    	// case 1: rotateR(); SHFTY(); break;
+    	// }
+    	// v--;
+    	var temp = reverse; reverse = 1; g=1; rotateCubeVert(); reverse = temp; 
+    	SHFT = 1; rotateL(); SHFTY(); rotateR();
+
+    	for(var i = 0; i<cubes.length; i++){
+    		if(isIn(i,L)||isIn(i,R))
+    			cubes[i].moving = 0;
+    		else{
+    			cubes[i].moving = 1;
+    			cubes[i].axis = 3;
+    		}
     	}
-    	v--;
+    	v=0;
     }
-    else if(vPrime>0&&noneMoving()){
-    	switch(vPrime){
-    	case 2: SHFT = 1; rotateR(); SHFTY(); break;
-    	case 1: rotateL(); SHFTY(); break;
+    else if(vPrime>0&&allMoving){
+    	// switch(vPrime){
+    	// case 2: SHFT = 1; rotateR(); SHFTY(); break;
+    	// case 1: rotateL(); SHFTY(); break;
+    	// }
+    	// vPrime--;
+    	var temp = reverse; reverse = 0; rotateCubeVert(); reverse = temp;
+    	SHFT = 1; rotateR(); SHFTY(); rotateL(); SHFTY();
+    	for(var i = 0; i<cubes.length; i++){
+    		if(isIn(i,L)||isIn(i,R))
+    			cubes[i].moving = 0;
+    		else{
+    			cubes[i].moving = 1;
+    			cubes[i].axis = 0;
+    		}
     	}
-    	vPrime--;
+    	vPrime=0;
     }
     else if(o>0&&noneMoving()){
     	switch(o){

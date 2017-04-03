@@ -86,6 +86,24 @@
 		<button id="create">Save state to txt</button>
 		<a download="info.txt" id="downloadlink"><input type="file" id="myFile" style="display: none">Download</a>
 		<br>
-		<input type="file" id="myFile" ><button onclick="myFunction()" id="but">Load</button>
+		<input type="file" id="mfile" >
 	</body>
+	<script type="text/javascript">
+		document.getElementById("mfile").addEventListener("change",function(e){
+	    var f = e.target.files[0];
+	    if(e.target.files.length==0){
+	    	console.log(e.target.files);
+	    }
+	   	var reader = new FileReader();
+	    reader.onload = function(e) {
+	        //console.log(e.target.result)
+	        console.log("loaded");
+	        loadCurrentState(reader.result);
+	    };
+	    // Finally read the file as a text string
+	    reader.readAsText(f);
+	    e.disabled = true;
+		});
+	</script>
+
 </html>

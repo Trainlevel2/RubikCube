@@ -4,12 +4,8 @@ var gl;
 
 var NumVertices=36;
 
-//var cubes = [];
 var points = [];				//Array of Vertices
 var colors = [];
-// var yAxis = 0;
-// var xAxis = 1;
-// var zAxis = 2;
 
 // var axis = 0;
 var theta = [0,0,0]
@@ -129,33 +125,6 @@ function initKeyGroups(){
 	F.right = [20,23,26];	
 	F.solved = [18,19,20,21,22,23,24,25,26]; //Front
 
-	// V = new Object();
-	// V.left  = [1,4,7];
-	// V.vertic=[10,13,16];
-	// V.right = [19,22,25];
-	// V.down  =[1,10,19];
-	// V.middle=13;
-	// V.up    =[7,16,25];
-	// V = [1,4,7,10,13,16,19,22,25]; //Vertical Middle
-
-	// M = new Object();
-	// M.up    = [3,4,5];
-	// M.middle= 13;
-	// M.down  = [21,22,23];
-	// M.left  = [3,12,21];
-	// M.vertic= [4,13,22];
-	// M.right = [5,14,23];
-	// M = [3,4,5,12,13,14,21,22,23]; //Horizontal Middle
-
-	// O = new Object();
-	// O.down  = [9,10,11];
-	// O.middle= 13;
-	// O.up    = [15,16,17];
-	// O.left  = [9,12,15];
-	// O.vertic= [10,13,16];
-	// O.right = [11,14,17];
-	// O = [9,10,11,12,13,14,15,16,17]; //Second Layer
-
 }
 
 window.onload = function init(){
@@ -222,43 +191,9 @@ window.onload = function init(){
     	g=1;
     	rotateCubeVert();
     };
-    // document.getElementById( "zButton" ).onclick = function () {
-    // 	g=1;
-    // 	for(var i = 0; i<cubes.length; i++){
-    // 		if(cubes[i].moving){
-    // 			return;
-    // 		}
-    // 	}
-    //  	for(var i = 0; i<cubes.length; i++){
-    //     	cubes[i].axis = cubes[i].zAxis;
-    // 		cubes[i].moving = 1;
-    // 	}
-
-    // };
-
-    // document.getElementById( "Stop").onclick = function () { 
-    // 	for(var i = 0; i<cubes.length; i++){
-    // 		if(cubes[i].moving){
-    // 			return;
-    // 		}
-    // 	}
-    // 	for(var i = 0; i<cubes.length; i++){
-    // 		cubes[i].moving = (cubes[i].moving+1)%2;
-    // 	}
-    // 	// if(moving==0)
-	   //  // 	document.getElementById("Stop").innerHTML = "Move Cube";
-	   //  // else
-	   //  // 	document.getElementById("Stop").innerHTML = "Stop Cube";
-    // };
+ 
 	document.getElementById( "Reverse" ).onclick = function () {
-		//fix
 		reverse = !reverse;
-    	// for(var i = 0; i<cubes.length; i++){
-	    //     cubes[i].axis=(cubes[i].axis+3)%6;
-	    //     cubes[i].xAxis = (cubes[i].xAxis+3)%6;
-	    //     cubes[i].yAxis = (cubes[i].yAxis+3)%6;
-	    //     cubes[i].zAxis = (cubes[i].zAxis+3)%6;
-	    // }
     };    
 }
 function rotateObjCo(Obj){
@@ -398,28 +333,12 @@ function rotateL(){
    	}
 	//Rotate The Plane
 	for(var i = 0; i<L.left.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[L.left[i]].curTheta[j] = cubes[R.left[i]].theta[j];
-		// }
 		cubes[L.left[i]].moving = 1;
 	}
-	//Rotate center cube
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[L.up[1]].curTheta[j] = cubes[R.up[1]].theta[j];
-	// }
 	cubes[L.up[1]].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[L.middle].curTheta[j] = cubes[R.middle].theta[j];
-	// }
 	cubes[L.middle].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[L.down[1]].curTheta[j] = cubes[R.down[1]].theta[j];
-	// }
 	cubes[L.down[1]].moving = 1;
 	for(var i = 0; i<L.right.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[L.right[i]].curTheta[j] = cubes[R.right[i]].theta[j];
-		// }
 		cubes[L.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -483,27 +402,12 @@ function rotateR(){
    	for(var i = 0; i<cubes.length; i++)
 		cubes[i].axis = 0;
 	for(var i = 0; i<R.left.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[R.left[i]].curTheta[j] = cubes[L.left[i]].theta[j];
-		// }
 		cubes[R.left[i]].moving = 1;
 	}
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[R.up[1]].curTheta[j] = cubes[L.up[1]].theta[j];
-	// }
 	cubes[R.up[1]].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[R.middle].curTheta[j] = cubes[L.middle].theta[j];
-	// }
 	cubes[R.middle].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[R.down[1]].curTheta[j] = cubes[L.down[1]].theta[j];
-	// }
 	cubes[R.down[1]].moving = 1;
 	for(var i = 0; i<R.right.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[R.right[i]].curTheta[j] = cubes[L.right[i]].theta[j];
-		// }
 		cubes[R.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -564,27 +468,12 @@ function rotateU(){
 		cubes[i].axis = 1;
 	//Rotate The Plane
 	for(var i = 0; i<U.left.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[U.left[i]].curTheta[j] = cubes[D.left[i]].theta[j];
-		// }
 		cubes[U.left[i]].moving = 1;
 	}
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[U.up[1]].curTheta[j] = cubes[D.up[1]].theta[j];
-	// }
 	cubes[U.up[1]].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[U.middle].curTheta[j] = cubes[D.middle].theta[j];
-	// }
 	cubes[U.middle].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[U.down[1]].curTheta[j] = cubes[D.down[1]].theta[j];
-	// }
 	cubes[U.down[1]].moving = 1;
 	for(var i = 0; i<U.right.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[U.right[i]].curTheta[j] = cubes[D.right[i]].theta[j];
-		// }
 		cubes[U.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -645,27 +534,12 @@ function rotateD(){
 	//Initialize Parameters
 	//Rotate The Plane
 	for(var i = 0; i<D.left.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[D.left[i]].curTheta[j] = cubes[U.left[i]].theta[j];
-		// }
 		cubes[D.left[i]].moving = 1;
 	}
-	// for(var j = 0; j<theta.length; j++){
-	// 		cubes[D.up[1]].curTheta[j] = cubes[U.up[1]].theta[j];
-	// }
 	cubes[D.up[1]].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 		cubes[D.middle].curTheta[j] = cubes[U.middle].theta[j];
-	// }
 	cubes[D.middle].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 		cubes[D.down[1]].curTheta[j] = cubes[U.down[1]].theta[j];
-	// }
 	cubes[D.down[1]].moving = 1;
 	for(var i = 0; i<D.right.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[D.right[i]].curTheta[j] = cubes[U.right[i]].theta[j];
-		// }
 		cubes[D.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -731,27 +605,12 @@ function rotateB(){
 	// B.down = D.down;
 	//Rotate The Plane
 	for(var i = 0; i<B.left.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[B.left[i]].curTheta[j] = cubes[F.left[i]].theta[j];
-		// }
 		cubes[B.left[i]].moving = 1;
 	}
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[B.up[1]].curTheta[j] = cubes[F.up[1]].theta[j];
-	// }
 	cubes[B.up[1]].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[B.middle].curTheta[j] = cubes[F.middle].theta[j];
-	// }
 	cubes[B.middle].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[B.down[1]].curTheta[j] = cubes[F.down[1]].theta[j];
-	// }
 	cubes[B.down[1]].moving = 1;
 	for(var i = 0; i<B.right.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[B.right[i]].curTheta[j] = cubes[F.right[i]].theta[j];
-		// }
 		cubes[B.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -817,27 +676,12 @@ function rotateF(){
 	// F.left = L.right;
 	//Rotate The Plane
 	for(var i = 0; i<F.left.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-		// 	cubes[F.left[i]].curTheta[j] = cubes[B.right[i]].theta[j];
-		// }
 		cubes[F.left[i]].moving = 1;
 	}
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[F.up[1]].curTheta[j] = cubes[B.up[1]].theta[j];
-	// }
 	cubes[F.up[1]].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[F.middle].curTheta[j] = cubes[B.middle].theta[j];
-	// }
 	cubes[F.middle].moving = 1;
-	// for(var j = 0; j<theta.length; j++){
-	// 	cubes[F.down[1]].curTheta[j] = cubes[B.down[1]].theta[j];
-	// }
 	cubes[F.down[1]].moving = 1;
 	for(var i = 0; i<F.right.length; i++){
-		// for(var j = 0; j<theta.length; j++){
-			// cubes[F.right[i]].curTheta[j] = cubes[B.right[i]].theta[j];
-		// }
 		cubes[F.right[i]].moving = 1;
 	}
 	//Move the indices on the plane and change other plane's indices
@@ -995,42 +839,42 @@ function doRotation(){
 
 function solvedAll(){
 	// return solved(F)&&solved(B)&&solved(U)&&solved(D)&&solved(L)&&solved(R);
-	var mat = [];
-	mat.push(mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1));
-	for (var i = 1; i<4; i++) {
-		for(var j=0; j<2; j++){
-			for(var k=0; k<2; k++){
-				for(var l=0; l<2; l++){
-					if(!(j==k&&k==l))
-						mat.push(mult(mat[0],rotate(90*i,j+0.0,k+0.0,l+0.0)));
+	var count = 0; var ind2 = 0;
+	for(var i=0; i<cubes.length-1; i++){
+		if(i+1==L.middle||i+1==R.middle||i+1==U.middle||i+1==D.middle||i+1==B.middle||i+1==F.middle){
+			ind2 = i+2;
+		}
+		else if(i==L.middle||i==R.middle||i==U.middle||i==D.middle||i==B.middle||i==F.middle){
+			continue;
+		}
+		else{
+			ind2 = i+1;
+		}
+		console.log(matRound(cubes[i].rMatrix)+"vs");
+		console.log(matRound(cubes[i+1].rMatrix));
+		for (var j=0; j<cubes[i].rMatrix.length; j++){
+			for (var k=0; k<cubes[i].rMatrix[j].length; k++){
+				if(Math.round(cubes[i].rMatrix[j][k])!==Math.round(cubes[ind2].rMatrix[j][k])){
+					console.log("i"+i+"i+1"+(i+1));
+					count++;
 				}
 			}
 		}
-	}
-	for(var i=0; i<mat.length;i++){
-		console.log("Mat"+i+"="+mat[i]);
-	}
-	var count = 0;
-	for(var l=0; l<mat.length; mat++){
-		for(var i=0; i<cubes.length; i++){
-			console.log(cubes[i].rMatrix);
-			for (var j=0; j<cubes[i].rMatrix.length; j++){
-				for (var k=0; k<cubes[i].rMatrix[j].length; k++){
-					if(Math.round(cubes[i].rMatrix[j][k])!=Math.round(mat[l][j][k])){
-						// console.log((cubes[i].rMatrix[j][k])+"vs"+mat[l][j][k]);
-						count++;					
-					}
-				}
-			}
+		if(i+1==L.middle||i+1==R.middle||i+1==U.middle||i+1==D.middle||i+1==B.middle||i+1==F.middle){
+			i++;
 		}
-		if(count){
-			count=0;
-		}
-		else
-			return true;
 	}
-	return false;
+	return count==0;
 }
+
+function matRound(mat){
+	rmat = JSON.parse(JSON.stringify(mat));
+	for(var i=0; i<mat.length; i++)
+		for(var j=0; j<mat[i].length; j++)
+			rmat[i][j] = Math.round(rmat[i][j]);
+	return rmat;
+}
+
 
 function contains(value,array){
 	for(var i = 0; i<array.length; i++){
@@ -1050,27 +894,6 @@ function SHFTY(){
 	}
 }
 
-// function solved(obj){
-// 	var aF=	obj.solved;
-// 	for(var i = 0; i<obj.left.length; i++){
-// 		if(!contains(obj.left[i],aF))
-// 			return false;
-// 	}
-// 	for(var i = 0; i<obj.up.length; i++){
-// 		if(!contains(obj.up[i],aF))
-// 			return false;
-// 	}
-// 	for(var i = 0; i<obj.down.length; i++){
-// 		if(!contains(obj.down[i],aF))
-// 			return false;
-// 	}
-// 	for(var i = 0; i<obj.right.length; i++){
-// 		if(!contains(obj.right[i],aF))
-// 			return false;
-// 	}
-// 	return true;
-
-// }
 
 function render(){
 	gl.depthFunc(gl.LEQUAL); 
@@ -1078,9 +901,9 @@ function render(){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	mvMatrix = lookAt(eye, at, up);
 	pMatrix  = ortho (left, right, bottom, ytop, near, far);
-	// mvMatrix = mult(cubes[0].grMatrix,mvMatrix);
     gl.uniformMatrix4fv( mvMatrixLoc, false, flatten(mvMatrix) );
     gl.uniformMatrix4fv( pMatrixLoc, false, flatten(pMatrix) );
+    //Take care of special cases where the cube rotates more than once, i.e. middle layers
     if(noneMoving()&&ind>0){
     	console.log("Done");
     	doRotation();
@@ -1129,6 +952,7 @@ function render(){
     	oPrime--;
     }
     var gfinal=0;
+    //Calculate rotation matrices
 	for(var i = 0; i<cubes.length; i++){
 		if(cubes[i].moving&&cubes[i].axis>2){
 			cubes[i].theta-=10.0;
@@ -1142,8 +966,12 @@ function render(){
 				cubes[i].moving = 0;
 				if(g) gfinal=1;
 				if(solvedAll()&&start!=false)
-					document.getElementById("Title").innerHTML="YOU SOLVED IT!";
+					document.getElementById("Title").innerHTML="Rubik's Cube Master (SOLVED IT!)";
 				start = true;
+				if(start){
+					document.getElementById("Title").innerHTML="Rubik's Cube Practice";
+					start = false
+				}
 			}
 		}
 		else if(cubes[i].moving)   {
@@ -1158,20 +986,17 @@ function render(){
 			    cubes[i].moving = 0;
 			    if(g) gfinal=1;
 				if(solvedAll()&&start!=false)
-					document.getElementById("Title").innerHTML="YOU SOLVED IT!";
+					document.getElementById("Title").innerHTML="Rubik's Cube Master (SOLVED IT!)";
 				start = true;
+				if(start){
+					document.getElementById("Title").innerHTML="Rubik's Cube Practice";
+					start = false
+				}
 		    }
 
 		}
-
-		// if(g){
-		// 	if(gfinal) g=0;
-		// 	cubes[i].grMatrix = mult(mult(mult(cubes[i].rMatrixZ,cubes[i].rMatrixY),cubes[i].rMatrixX),cubes[i].grMatrix);
-		// }
-		// else{
-			cubes[i].rMatrix =mult(mult(mult(cubes[i].rMatrixZ,cubes[i].rMatrixY),cubes[i].rMatrixX),cubes[i].rMatrix);
-		// }
-
+		//Multiply to current rotation matrix
+		cubes[i].rMatrix =mult(mult(mult(cubes[i].rMatrixZ,cubes[i].rMatrixY),cubes[i].rMatrixX),cubes[i].rMatrix);
 		gl.uniformMatrix4fv(grMatrixLoc, false, flatten(cubes[i].grMatrix));
 		gl.uniformMatrix4fv(rMatrixLoc, false, flatten(cubes[i].rMatrix));
 		cubes[i].rMatrixX = mat4(); cubes[i].rMatrixY = mat4(); cubes[i].rMatrixZ = mat4();
@@ -1184,45 +1009,47 @@ function render(){
 	
 }
 
+//Returns a textfile version of the code
 function getCurrentState(){
-	var str="";
+	var str=JSON.stringify(L)+"#"+JSON.stringify(R)+"#"+JSON.stringify(U)+"#"+JSON.stringify(D)+"#"+JSON.stringify(F)+"#"+JSON.stringify(B)+"#";
 	for(var i = 0; i<cubes.length; i++)
 		str = str + JSON.stringify(cubes[i].rMatrix)+"@"+JSON.stringify(cubes[i].grMatrix)+"%";
 	return str;
 }
 
+//Loads a textfile version of the code
 function loadCurrentState(string){
-	var f = 0;
+	var f = 0; var temparray=[];
+	L = JSON.parse(string.substring(0,string.indexOf("#")));
+	string = string.substring(string.indexOf("#")+1);
+	R = JSON.parse(string.substring(0,string.indexOf("#")));
+	string = string.substring(string.indexOf("#")+1);
+	U = JSON.parse(string.substring(0,string.indexOf("#")));
+	string = string.substring(string.indexOf("#")+1);
+	D = JSON.parse(string.substring(0,string.indexOf("#")));
+	string = string.substring(string.indexOf("#")+1);
+	F = JSON.parse(string.substring(0,string.indexOf("#")));
+	string = string.substring(string.indexOf("#")+1);
+	B = JSON.parse(string.substring(0,string.indexOf("#")));
+	string = string.substring(string.indexOf("#")+1);
 	for(var i = 0; i<cubes.length; i++){
 		var index = string.indexOf("%");
 		if(index<0)
 			window.alert(index);
 		var cubeStr = string.substring(f,index);
-		cubes[i].rMatrix = JSON.parse(cubeStr.substring(0,cubeStr.indexOf("@")));
-		cubes[i].grMatrix = JSON.parse(cubeStr.substring(cubeStr.indexOf("@")+1,cubeStr.indexOf("%")));
-		string = string.substring(index);
-		f=index;
+		var indexat = cubeStr.indexOf("@");
+		var temp = JSON.parse(cubeStr.substring(f,indexat));
+		for(var a=0; a<temp.length; a++)
+			for(var b=0; b<temp[a].length; b++)
+				temparray.push(temp[a][b]);
+		cubes[i].rMatrix = mat4(temparray);
+		cubes[i].grMatrix = JSON.parse(cubeStr.substring(indexat+1));
+		string = string.substring(index+1,string.length);
+		temparray = [];
 	}
 }
 
-function myFunction() {
-    var x = document.getElementById("myFile");
-    if(x.files.length==0){
-    	console.log(x.files);
-    	return;
-    }
-   	var f = x.files[0];
-   	var reader = new FileReader();
-    reader.onload = function(e) {
-        //console.log(e.target.result)
-        console.log("loaded");
-        loadCurrentState(reader.result);
-    };
-    // Finally read the file as a text string
-    reader.readAsText(file);
-    x.disabled = true;
-}
-
+//Makes the text file
 function checkIt(){
 var textFile = null,
   makeTextFile = function (text) {
@@ -1247,6 +1074,7 @@ var textFile = null,
   }, false);
 };
 
+//Initializes all parameters for every cube, including 6 "quad" faces
 function buildCube(i)
 {
     quad( 1, 0, 3, 2 ,i);
@@ -1280,6 +1108,7 @@ function buildCube(i)
     cubes.push(cube);
 }
 
+//Cubenum affects the location of each of the 27 cubes - some simple graph math avoiding translations
 function quad(a, b, c, d, cubenum)
 {
 	//define vertices for all 27 .32x.32x.32 cubes in one single vertices definition, with .02 spacing
@@ -1292,16 +1121,6 @@ function quad(a, b, c, d, cubenum)
         vec4( -0.5 +(cubenum%3)*0.34, -0.18+(Math.floor(cubenum/3)%3)*0.34,  0.18-(Math.floor(cubenum/9)%3)*0.34, 1.0 ),
         vec4( -0.18+(cubenum%3)*0.34, -0.18+(Math.floor(cubenum/3)%3)*0.34,  0.18-(Math.floor(cubenum/9)%3)*0.34, 1.0 ),
         vec4( -0.18+(cubenum%3)*0.34, -0.5 +(Math.floor(cubenum/3)%3)*0.34,  0.18-(Math.floor(cubenum/9)%3)*0.34, 1.0 )
-
-        // Outer cube defined as:
-        // vec4( -0.5, -0.5,  0.5, 1.0 ),
-        // vec4( -0.5,  0.5,  0.5, 1.0 ),
-        // vec4(  0.5,  0.5,  0.5, 1.0 ),
-        // vec4(  0.5, -0.5,  0.5, 1.0 ),
-        // vec4( -0.5, -0.5, -0.5, 1.0 ),
-        // vec4( -0.5,  0.5, -0.5, 1.0 ),
-        // vec4(  0.5,  0.5, -0.5, 1.0 ),
-        // vec4(  0.5, -0.5, -0.5, 1.0 )
     ];
 
     var vertexColors = [
